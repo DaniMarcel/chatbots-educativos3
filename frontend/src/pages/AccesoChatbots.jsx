@@ -468,7 +468,7 @@ export default function AccesoChatbots() {
                               className="btn btn-danger btn-sm"
                               title="Eliminar chatbot"
                               onClick={() => eliminarChatbot(b._id || b.id)}
-                              disabled={rol !== 'admin' && rol !== 'superadmin'}
+                              disabled={rol === 'alumno'}
                             >
                               Eliminar
                             </button>
