@@ -44,23 +44,19 @@ const EditarHeroSection = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData();
-        const cleanHeroBlocks = heroBlocks.map(b => {
-            const newBlock = { ...b };
-            if (newBlock.image instanceof File) {
-                delete newBlock.image;
-            }
-            if (newBlock.pdf instanceof File) {
-                delete newBlock.pdf;
-            }
-            return newBlock;
-        });
-        formData.append('heroBlocks', JSON.stringify(cleanHeroBlocks));
-
+        
         heroBlocks.forEach((block, index) => {
+            formData.append(`heroBlocks[${index}][title]`, block.title);
+            
             if (block.image instanceof File) {
                 formData.append(`heroBlocks[${index}][image]`, block.image);
+            } else if (block.image) {
+                formData.append(`heroBlocks[${index}][image]`, block.image);
             }
+
             if (block.pdf instanceof File) {
+                formData.append(`heroBlocks[${index}][pdf]`, block.pdf);
+            } else if (block.pdf) {
                 formData.append(`heroBlocks[${index}][pdf]`, block.pdf);
             }
         });

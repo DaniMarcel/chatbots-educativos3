@@ -85,13 +85,30 @@ router.put('/hero-blocks', verificarToken, autorizarRoles('superadmin'), upload.
             const imageFile = files.find(f => f.fieldname === imageKey);
             const pdfFile = files.find(f => f.fieldname === pdfKey);
 
-            const oldImage = panelConfig.heroBlocks[i] ? panelConfig.heroBlocks[i].image : undefined;
-            const oldPdf = panelConfig.heroBlocks[i] ? panelConfig.heroBlocks[i].pdf : undefined;
+            const existingBlock = panelConfig.heroBlocks[i];
+
+            let image, pdf;
+
+            if (imageFile) {
+                image = imageFile.filename;
+            } else if (body[imageKey] && body[imageKey] !== 'undefined' && body[imageKey] !== 'null') {
+                image = body[imageKey];
+            } else if (existingBlock) {
+                image = existingBlock.image;
+            }
+
+            if (pdfFile) {
+                pdf = pdfFile.filename;
+            } else if (body[pdfKey] && body[pdfKey] !== 'undefined' && body[pdfKey] !== 'null') {
+                pdf = body[pdfKey];
+            } else if (existingBlock) {
+                pdf = existingBlock.pdf;
+            }
 
             updatedHeroBlocks.push({
                 title: body[titleKey],
-                image: imageFile ? imageFile.filename : (body[imageKey] || oldImage),
-                pdf: pdfFile ? pdfFile.filename : (body[pdfKey] || oldPdf),
+                image: image,
+                pdf: pdf,
             });
         }
 
