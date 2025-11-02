@@ -6,7 +6,7 @@ const path = require('path');
 // Multer storage configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/hero/');
+    cb(null, path.join(__dirname, '../uploads/hero/'));
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname)); // Append extension
@@ -38,4 +38,4 @@ router.post('/', upload.single('file'), (req, res) => {
   res.send({ filePath: `/uploads/hero/${req.file.filename}` });
 });
 
-module.exports = router;
+module.exports = { router, upload };

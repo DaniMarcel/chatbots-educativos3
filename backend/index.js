@@ -54,7 +54,8 @@ app.use((req, res, next) => { if (req.method === "OPTIONS") return res.sendStatu
 
 /* ====== Parsers ====== */
 app.use(express.json({ limit: "2mb" }));
-app.use('/uploads', express.static('uploads'));
+const path = require("path");
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 /* ====== Rutas ====== */
 // Nota: cada prefijo montado **una sola vez**

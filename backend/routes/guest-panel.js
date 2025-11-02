@@ -1,21 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const path = require('path');
+const { upload } = require('./upload-hero');
 const GuestPanel = require('../models/GuestPanel');
 const { verificarToken, autorizarRoles } = require('../middlewares/auth');
-
-// Multer storage configuration
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
-
-const upload = multer({ storage: storage });
 
 // GET guest panel configuration
 router.get('/', async (req, res) => {
