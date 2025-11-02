@@ -64,27 +64,38 @@ router.get('/', async (req, res) => {
 
 // PUT (update) guest panel configuration
 router.put('/hero-blocks', verificarToken, autorizarRoles('superadmin'), upload.any(), async (req, res) => {
-    const { heroBlocks } = req.body;
-    const files = req.files;
+    const { body, files } = req;
 
     try {
         let panelConfig = await GuestPanel.findOne();
         if (!panelConfig) {
-            panelConfig = new GuestPanel({});
+            panelConfig = new GuestPanel({ heroBlocks: [] });
         }
 
-        if (heroBlocks) {
-            const updatedHeroBlocks = JSON.parse(heroBlocks).map((block, index) => {
-                const imageFile = files.find(f => f.fieldname === `heroBlocks[${index}][image]`);
-                const pdfFile = files.find(f => f.fieldname === `heroBlocks[${index}][pdf]`);
-                return {
-                    title: block.title,
-                    image: imageFile ? imageFile.filename : block.image,
-                    pdf: pdfFile ? pdfFile.filename : block.pdf,
-                };
+        const updatedHeroBlocks = [];
+        for (let i = 0; ; i++) {
+            const titleKey = `heroBlocks[${i}][title]`;
+            if (!body[titleKey]) {
+                break; 
+            }
+
+            const imageKey = `heroBlocks[${i}][image]`;
+            const pdfKey = `heroBlocks[${i}][pdf]`;
+
+            const imageFile = files.find(f => f.fieldname === imageKey);
+            const pdfFile = files.find(f => f.fieldname === pdfKey);
+
+            const oldImage = panelConfig.heroBlocks[i] ? panelConfig.heroBlocks[i].image : undefined;
+            const oldPdf = panelConfig.heroBlocks[i] ? panelConfig.heroBlocks[i].pdf : undefined;
+
+            updatedHeroBlocks.push({
+                title: body[titleKey],
+                image: imageFile ? imageFile.filename : (body[imageKey] || oldImage),
+                pdf: pdfFile ? pdfFile.filename : (body[pdfKey] || oldPdf),
             });
-            panelConfig.heroBlocks = updatedHeroBlocks;
         }
+
+        panelConfig.heroBlocks = updatedHeroBlocks;
 
         await panelConfig.save();
         res.json(panelConfig);
