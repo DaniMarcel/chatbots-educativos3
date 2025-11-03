@@ -116,8 +116,8 @@ router.put('/hero-blocks', verificarToken, autorizarRoles('superadmin'), upload.
 
             updatedHeroBlocks.push({
                 title: body[titleKey],
-                image: image,
-                pdf: pdf,
+                image: image || null,
+                pdf: pdf || null,
             });
         }
 
