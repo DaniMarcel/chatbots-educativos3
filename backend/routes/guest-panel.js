@@ -78,7 +78,7 @@ router.put('/hero-blocks', verificarToken, autorizarRoles('superadmin'), upload.
         for (let i = 0; ; i++) {
             const titleKey = `heroBlocks[${i}][title]`;
             if (!body[titleKey]) {
-                break; 
+                break;
             }
 
             const imageKey = `heroBlocks[${i}][image]`;
@@ -91,10 +91,17 @@ router.put('/hero-blocks', verificarToken, autorizarRoles('superadmin'), upload.
 
             let image, pdf;
 
+            const processPath = (path) => {
+                if (path && path.includes('/uploads/')) {
+                    return path.split('/uploads/')[1];
+                }
+                return path;
+            };
+
             if (imageFile) {
                 image = 'hero/' + imageFile.filename;
             } else if (body[imageKey] && body[imageKey] !== 'undefined' && body[imageKey] !== 'null') {
-                image = body[imageKey];
+                image = processPath(body[imageKey]);
             } else if (existingBlock && existingBlock.image) {
                 image = existingBlock.image;
             }
@@ -102,7 +109,7 @@ router.put('/hero-blocks', verificarToken, autorizarRoles('superadmin'), upload.
             if (pdfFile) {
                 pdf = 'hero/' + pdfFile.filename;
             } else if (body[pdfKey] && body[pdfKey] !== 'undefined' && body[pdfKey] !== 'null') {
-                pdf = body[pdfKey];
+                pdf = processPath(body[pdfKey]);
             } else if (existingBlock && existingBlock.pdf) {
                 pdf = existingBlock.pdf;
             }
