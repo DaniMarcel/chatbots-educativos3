@@ -16,44 +16,8 @@ router.get('/', async (req, res) => {
                     text: 'Explora los recursos que hemos preparado para ti.'
                 },
                 chatbots: [],
-                videos: [],
-                heroBlocks: [
-                    {
-                        title: 'Cursos Cortos',
-                        image: 'B1.png',
-                        pdf: '#'
-                    },
-                    {
-                        title: 'Matriculas Abiertas 2026',
-                        image: 'B2.png',
-                        pdf: '#'
-                    },
-                    {
-                        title: 'Información Adicional',
-                        image: 'B3.png',
-                        pdf: '#'
-                    }
-                ]
+                videos: []
             });
-            await panelConfig.save();
-        } else if (!panelConfig.heroBlocks || panelConfig.heroBlocks.length === 0) {
-            panelConfig.heroBlocks = [
-                {
-                    title: 'Cursos Cortos',
-                    image: 'B1.png',
-                    pdf: '#'
-                },
-                {
-                    title: 'Matriculas Abiertas 2026',
-                    image: 'B2.png',
-                    pdf: '#'
-                },
-                {
-                    title: 'Información Adicional',
-                    image: 'B3.png',
-                    pdf: '#'
-                }
-            ];
             await panelConfig.save();
         }
         res.json(panelConfig);
