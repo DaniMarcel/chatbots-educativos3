@@ -1,17 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { upload } = require('./upload-hero');
+ 
 const GuestPanel = require('../models/GuestPanel');
 const { verificarToken, autorizarRoles } = require('../middlewares/auth');
 const mongoose = require('mongoose');
-const Grid = require('gridfs-stream');
-
-let gfs;
-const conn = mongoose.connection;
-conn.once('open', () => {
-  gfs = Grid(conn.db, mongoose.mongo);
-  gfs.collection('uploads');
-});
 
 // GET guest panel configuration
 router.get('/', async (req, res) => {
@@ -69,88 +61,6 @@ router.get('/', async (req, res) => {
         console.error('Error fetching guest panel config:', error);
         res.status(500).send('Error del servidor al obtener la configuración del panel de visita.');
     }
-});
-
-// PUT (update) guest panel configuration
-router.put('/hero-blocks', verificarToken, autorizarRoles('superadmin'), upload.any(), async (req, res) => {
-    const { body, files } = req;
-
-    try {
-        let panelConfig = await GuestPanel.findOne();
-        if (!panelConfig) {
-            panelConfig = new GuestPanel({ heroBlocks: [] });
-        } else if (!panelConfig.heroBlocks) {
-            panelConfig.heroBlocks = [];
-        }
-
-        const updatedHeroBlocks = [];
-        for (let i = 0; ; i++) {
-            const titleKey = `heroBlocks[${i}][title]`;
-            if (!body[titleKey]) {
-                break;
-            }
-
-            const imageKey = `heroBlocks[${i}][image]`;
-            const pdfKey = `heroBlocks[${i}][pdf]`;
-
-            const imageFile = files.find(f => f.fieldname === imageKey);
-            const pdfFile = files.find(f => f.fieldname === pdfKey);
-
-            const existingBlock = panelConfig.heroBlocks[i];
-
-            let image, pdf;
-
-            if (imageFile) {
-                image = imageFile.filename;
-            } else if (body[imageKey] && body[imageKey] !== 'undefined' && body[imageKey] !== 'null') {
-                image = body[imageKey];
-            } else if (existingBlock && existingBlock.image) {
-                image = existingBlock.image;
-            }
-
-            if (pdfFile) {
-                pdf = pdfFile.filename;
-            } else if (body[pdfKey] && body[pdfKey] !== 'undefined' && body[pdfKey] !== 'null') {
-                pdf = body[pdfKey];
-            } else if (existingBlock && existingBlock.pdf) {
-                pdf = existingBlock.pdf;
-            }
-
-            updatedHeroBlocks.push({
-                title: body[titleKey],
-                image: image || null,
-                pdf: pdf || null,
-            });
-        }
-
-        panelConfig.heroBlocks = updatedHeroBlocks;
-
-        await panelConfig.save();
-        res.json(panelConfig);
-    } catch (error) {
-        console.error('Error updating guest panel config:', error);
-        res.status(500).send('Error del servidor al actualizar la configuración del panel de visita.');
-    }
-});
-
-// GET a file from GridFS
-router.get('/hero-blocks/file/:filename', (req, res) => {
-    gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-        if (!file || file.length === 0) {
-            return res.status(404).json({
-                err: 'No file exists'
-            });
-        }
-
-        if (file.contentType === 'image/jpeg' || file.contentType === 'image/png' || file.contentType === 'application/pdf') {
-            const readstream = gfs.createReadStream(file.filename);
-            readstream.pipe(res);
-        } else {
-            res.status(404).json({
-                err: 'Not an image or pdf'
-            });
-        }
-    });
 });
 
 module.exports = router;
