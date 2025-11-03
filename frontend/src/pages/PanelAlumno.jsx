@@ -249,7 +249,7 @@ export default function PanelAlumno() {
           </div>
 
           <div className="user-card">
-            <img src="/logoinvitado.png" alt="Perfil" className="avatar" />
+            <span className="avatar-emoji">👨‍🎓</span>
             <div className="user-info">
               <div className="user-name">{usuario?.nombre} {usuario?.apellido}</div>
               <div className="user-doc">{usuario?.tipo_documento} {usuario?.numero_documento}</div>
@@ -264,7 +264,7 @@ export default function PanelAlumno() {
               <span className="nav-ico">💬</span><span>Chatbots</span>
             </button>
             <button className={`nav-item ${seccion === 'otros' ? 'active' : ''}`} onClick={() => setSeccion('otros')}>
-              <span className="nav-ico">⚙️</span><span>Otras opciones</span>
+              <span className="nav-ico">📽️</span><span>Videos</span>
             </button>
           </nav>
 

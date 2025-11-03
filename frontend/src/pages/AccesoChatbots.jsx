@@ -416,13 +416,15 @@ export default function AccesoChatbots() {
                   Agregar video
                 </button>
               </div>
-              <button
-                className="btn btn-primary"
-                onClick={crearChatbot}
-                disabled={!nuevoBot.trim() || creandoBot}
-              >
-                {creandoBot ? "Creando…" : "Crear chatbot"}
-              </button>
+              <div style={{ textAlign: 'center', margin: '10px 0' }}>
+                <button
+                  className="btn btn-primary"
+                  onClick={crearChatbot}
+                  disabled={!nuevoBot.trim() || creandoBot}
+                >
+                  {creandoBot ? "Creando…" : "Crear chatbot"}
+                </button>
+              </div>
 
               <div className="cb-tablewrap">
                 <table className="cb-table">

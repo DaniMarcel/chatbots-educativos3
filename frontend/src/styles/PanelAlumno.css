@@ -338,3 +338,102 @@
   aspect-ratio: 16 / 9;
   border-radius: 8px;
 }
+
+/* Mejoras para la sección de perfil */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 8px;
+}
+
+.kv-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.kv {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.k {
+  font-weight: 500;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.v {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.status-bad {
+  color: #d32f2f;
+}
+
+.status-ok {
+  color: #388e3c;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.badge-verde {
+  background-color: #4caf50;
+  color: white;
+}
+
+.badge-amarillo {
+  background-color: #ff9800;
+  color: white;
+}
+
+.badge-rojo {
+  background-color: #f44336;
+  color: white;
+}
+
+.span-2 {
+  grid-column: span 2;
+}
+
+.avatar-emoji {
+  font-size: 40px; /* Ajusta el tamaño del emoji */
+  display: inline-block;
+  width: 50px; /* Mismo ancho que el avatar original */
+  height: 50px; /* Mismo alto */
+  text-align: center;
+  line-height: 50px; /* Centra verticalmente */
+  border-radius: 50%; /* Hace circular si es necesario */
+  background: #f0f0f0; /* Fondo opcional */
+}
