@@ -4,19 +4,19 @@ import '../styles/HeroSection.css';
 
 const heroBlocksData = [
   {
-    title: 'Masoterapia',
-    image: '/B1.png',
-    pdf: '/masoterapia.pdf', // Ruta al PDF en la carpeta public
+    title: 'Horarios y Aranceles',
+    image: '/horarios_aranceles.png',
+    pdf: '/horarios_aranceles.pdf', // Ruta al PDF en la carpeta public
   },
   {
-    title: 'Reiki',
-    image: '/B2.png',
-    pdf: '/reiki.pdf', // Ruta al PDF en la carpeta public
+    title: 'Cursos y Talleres',
+    image: '/cursos_talleres.jpg',
+    pdf: '/cursos_cortos.pdf', // Ruta al PDF en la carpeta public
   },
   {
-    title: 'Aromaterapia',
-    image: '/B3.png',
-    pdf: '/aromaterapia.pdf', // Ruta al PDF en la carpeta public
+    title: 'Malla Masoterapia 2026',
+    image: '/descargar_malla.png',
+    pdf: '/malla_masoterapia_2026.pdf', // Ruta al PDF en la carpeta public
   },
 ];
 
