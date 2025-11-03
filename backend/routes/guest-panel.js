@@ -70,6 +70,8 @@ router.put('/hero-blocks', verificarToken, autorizarRoles('superadmin'), upload.
         let panelConfig = await GuestPanel.findOne();
         if (!panelConfig) {
             panelConfig = new GuestPanel({ heroBlocks: [] });
+        } else if (!panelConfig.heroBlocks) {
+            panelConfig.heroBlocks = [];
         }
 
         const updatedHeroBlocks = [];
