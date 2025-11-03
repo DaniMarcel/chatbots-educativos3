@@ -92,18 +92,18 @@ router.put('/hero-blocks', verificarToken, autorizarRoles('superadmin'), upload.
             let image, pdf;
 
             if (imageFile) {
-                image = imageFile.filename;
+                image = 'hero/' + imageFile.filename;
             } else if (body[imageKey] && body[imageKey] !== 'undefined' && body[imageKey] !== 'null') {
                 image = body[imageKey];
-            } else if (existingBlock) {
+            } else if (existingBlock && existingBlock.image) {
                 image = existingBlock.image;
             }
 
             if (pdfFile) {
-                pdf = pdfFile.filename;
+                pdf = 'hero/' + pdfFile.filename;
             } else if (body[pdfKey] && body[pdfKey] !== 'undefined' && body[pdfKey] !== 'null') {
                 pdf = body[pdfKey];
-            } else if (existingBlock) {
+            } else if (existingBlock && existingBlock.pdf) {
                 pdf = existingBlock.pdf;
             }
 
