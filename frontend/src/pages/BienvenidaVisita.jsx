@@ -155,7 +155,7 @@ export default function BienvenidaVisita() {
           <div className="brand">
             <div className="logo">🤖</div>
             <div className="brand-text">
-              <span className="brand-top">Masoterapia</span>
+              <span className="brand-top">Masoterapia </span>
               <span className="brand-bottom">Chatbots</span>
             </div>
           </div>
