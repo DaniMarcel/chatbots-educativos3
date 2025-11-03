@@ -100,7 +100,7 @@ const EditarHeroSection = () => {
                                     name="image"
                                     onChange={(e) => handleChange(index, e)}
                                 />
-                                {block.image && <img src={typeof block.image === 'string' ? `${API_ROOT}/uploads/${block.image}` : URL.createObjectURL(block.image)} alt="Preview" className="image-preview" />}
+                                {block.image && <img src={typeof block.image === 'string' ? `${API_BASE}/guest-panel/hero-blocks/file/${block.image}` : URL.createObjectURL(block.image)} alt="Preview" className="image-preview" />}
                             </div>
                             <div className="form-group">
                                 <label>PDF</label>

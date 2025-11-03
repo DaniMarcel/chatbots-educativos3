@@ -41,8 +41,8 @@ const HeroSection = () => {
                     <div>
                         <h2>{block.title}</h2>
                     </div>
-                    <a href={`${API_ROOT}/uploads/${block.pdf}`} target="_blank" rel="noopener noreferrer" className="hero-image-link" aria-label={`Descargar ${block.title}`}>
-                        <img src={`${API_ROOT}/uploads/${block.image}`} alt={block.title} />
+                    <a href={`${API_BASE}/guest-panel/hero-blocks/file/${block.pdf}`} target="_blank" rel="noopener noreferrer" className="hero-image-link" aria-label={`Descargar ${block.title}`}>
+                        <img src={`${API_BASE}/guest-panel/hero-blocks/file/${block.image}`} alt={block.title} />
                     </a>
                     <div className="hero-block-footer">
                         <p>Descargar</p>
