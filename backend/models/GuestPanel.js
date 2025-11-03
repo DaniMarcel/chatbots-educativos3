@@ -10,20 +10,13 @@ const VideoSchema = new mongoose.Schema({
   videoUrl: { type: String, required: true }
 });
 
-const HeroBlockSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  image: { type: String, required: true },
-  pdf: { type: String, required: true },
-});
-
 const GuestPanelSchema = new mongoose.Schema({
   welcome: {
     title: { type: String, default: 'Bienvenido' },
     text: { type: String, default: '' }
   },
   chatbots: [ChatbotSchema],
-  videos: [VideoSchema],
-  heroBlocks: [HeroBlockSchema]
+  videos: [VideoSchema]
 });
 
 module.exports = mongoose.model('GuestPanel', GuestPanelSchema);

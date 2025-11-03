@@ -13,7 +13,7 @@ import BienvenidaVisita from './pages/BienvenidaVisita';
 import PaginaPrincipal from './pages/PaginaPrincipal';
 import LoginInvitado from './pages/LoginInvitado';
 import ResetPassword from './pages/ResetPassword';
-import EditarHeroSection from './pages/EditarHeroSection';
+ 
 
 
 // 🔐 Ruta protegida
@@ -78,14 +78,7 @@ function App() {
               </RutaProtegida>
             }
           />
-          <Route
-            path="/editar-hero"
-            element={
-              <RutaProtegida rolesPermitidos={['superadmin']}>
-                <EditarHeroSection />
-              </RutaProtegida>
-            }
-          />
+ 
         </Routes>
       </div>
     </Router>
