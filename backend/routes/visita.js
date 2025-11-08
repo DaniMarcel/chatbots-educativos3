@@ -29,7 +29,7 @@ router.post('/registro', async (req, res) => {
         return res.json({ msg: 'Visita no registrada para usuarios internos' });
       }
     } catch (err) {
-      console.log('❌ Token inválido, tratando como visita externa');
+      console.log('❌ Token inválido, tratando como visita externa XD');
     }
   } else {
     console.log('ℹ️ No hay token en la solicitud');
