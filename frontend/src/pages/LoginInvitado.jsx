@@ -112,8 +112,21 @@ function LoginInvitado() {
       setPhoneInput('');
       setEmailError('');
       setPhoneError('');
-    } catch {
-      Swal.fire('Error', 'No se pudo registrar la visita.', 'error');
+    } catch (err) {
+      if (err.response?.status === 409) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Correo ya registrado',
+          text: 'El correo que ingresaste ya pertenece a un alumno. Por favor, inicia sesión como alumno.',
+          confirmButtonText: 'Ir a Login de Alumno',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate('/login');
+          }
+        });
+      } else {
+        Swal.fire('Error', 'No se pudo registrar la visita.', 'error');
+      }
     }
   };
 
