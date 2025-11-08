@@ -36,8 +36,10 @@ router.post('/registro', async (req, res) => {
   }
 
   // Verificar si el correo pertenece a un alumno registrado
+  console.log('🔍 Verificando si correo pertenece a alumno:', correo);
   try {
     const alumnoExistente = await Alumno.findOne({ correo });
+    console.log('🔍 Resultado de findOne para alumno:', alumnoExistente ? 'Encontrado' : 'No encontrado');
     if (alumnoExistente) {
       console.log('✅ Correo pertenece a un alumno registrado, no se registra visita externa');
       return res.json({ msg: 'Visita no registrada para usuarios internos' });
