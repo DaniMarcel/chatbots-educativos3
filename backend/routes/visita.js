@@ -65,6 +65,9 @@ router.get('/exportar', verificarToken, autorizarRoles('superadmin'), async (req
   try {
     const visitas = await Visita.aggregate([
       {
+        $match: { rol: 'invitado' } // Filtrar solo visitas de invitados
+      },
+      {
         $group: {
           _id: '$correo',
           nombre: { $first: '$nombre' },
@@ -137,6 +140,9 @@ router.get('/exportar', verificarToken, autorizarRoles('superadmin'), async (req
 router.get('/', verificarToken, autorizarRoles('superadmin'), async (req, res) => {
   try {
     const visitas = await Visita.aggregate([
+      {
+        $match: { rol: 'invitado' } // Filtrar solo visitas de invitados
+      },
       {
         $group: {
           _id: '$correo',

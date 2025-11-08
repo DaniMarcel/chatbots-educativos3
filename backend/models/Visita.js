@@ -28,6 +28,7 @@ const visitaSchema = new mongoose.Schema(
     nombre:   { type: String, required: true, trim: true },
     correo:   { type: String, required: true, trim: true, lowercase: true, set: normalizarCorreo },
     whatsapp: { type: String, required: true, trim: true, set: normalizarWhatsApp },
+    rol: { type: String, enum: ['invitado', 'alumno'], default: 'invitado' }, // Campo para diferenciar el rol
 
     // Mantengo tu campo para compatibilidad con el front actual
     fechaHora: { type: Date, default: Date.now },
@@ -45,6 +46,7 @@ visitaSchema.index({ fechaHora: -1 });
 visitaSchema.index({ createdAt: -1 });
 visitaSchema.index({ correo: 1 });
 visitaSchema.index({ whatsapp: 1 });
+visitaSchema.index({ rol: 1 }); // Índice para el nuevo campo
 
 // Validación simple de email (opcional; relájala si te molesta)
 visitaSchema.path('correo').validate(function (v) {
