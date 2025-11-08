@@ -187,8 +187,11 @@ router.get('/alumnos', verificarToken, autorizarRoles('profesor'), async (req, r
     // 3. Extraer sus correos
     const correosAlumnos = alumnos.map((a) => a.correo);
 
-    // 4. Crear el filtro para que `correo` esté en la lista de sus alumnos
-    const filtroVisitas = { correo: { $in: correosAlumnos } };
+    // 4. Crear el filtro para que `correo` esté en la lista de sus alumnos y el rol sea 'alumno'
+    const filtroVisitas = { 
+      correo: { $in: correosAlumnos },
+      rol: 'alumno'
+    };
 
     const visitas = await Visita.aggregate([
       { $match: filtroVisitas },

@@ -61,6 +61,14 @@ router.post('/login', async (req, res) => {
       return res.status(403).json({ msg: 'Tu acceso está deshabilitado' });
     }
 
+    // Registrar visita de alumno (sin await para no bloquear)
+    new Visita({
+      nombre: `${alumno.nombre} ${alumno.apellido}`,
+      correo: alumno.correo,
+      whatsapp: alumno.telefono || '', // Usa el teléfono del alumno
+      rol: 'alumno'
+    }).save().catch(err => console.error('Error al guardar visita de alumno:', err));
+
     // no await intencional
     Alumno.findByIdAndUpdate(alumno._id, { $inc: { conteo_ingresos: 1 } }).catch(() => {});
 
