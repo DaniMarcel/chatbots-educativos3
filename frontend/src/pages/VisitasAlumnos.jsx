@@ -54,7 +54,7 @@ function VisitasAlumnos() {
                 <td>{v.nombre}</td>
                 <td>{v.correo}</td>
                 <td>{v.whatsapp}</td>
-                <td>{v.fechaHora ? new Date(v.fechaHora).toLocaleString('es-CL') : '-'}</td>
+                <td>{v.ultimaVisita ? new Date(v.ultimaVisita).toLocaleString('es-CL') : '-'}</td>
               </tr>
             ))}
             {!visitas.length && (
