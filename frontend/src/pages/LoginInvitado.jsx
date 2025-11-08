@@ -85,11 +85,18 @@ function LoginInvitado() {
     }
 
     try {
-      await axios.post(`${API_BASE}/visitas/registro`, {
-        nombre: visita.nombre.trim(),
-        correo: visita.correo.trim(),
-        whatsapp: e164, // guardamos en +569XXXXXXXX
-      });
+      const token = localStorage.getItem('token');
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+
+      await axios.post(
+        `${API_BASE}/visitas/registro`,
+        {
+          nombre: visita.nombre.trim(),
+          correo: visita.correo.trim(),
+          whatsapp: e164,
+        },
+        config
+      );
 
       Swal.fire({
         icon: 'success',
