@@ -18,6 +18,35 @@ router.post('/registro', async (req, res) => {
     return res.status(400).json({ msg: 'Todos los campos son obligatorios' });
   }
 
+  // Verificar si hay un token de autenticación y si el usuario es un alumno
+  const token = req.headers.authorization?.split(' ')[1]; // Extraer token del header
+  if (token) {
+    try {
+      const decoded = require('jsonwebtoken').verify(token, process.env.JWT_SECRET); // Decodificar token
+      console.log('🔍 Token decodificado, rol:', decoded.rol);
+      if (decoded.rol === 'alumno') {
+        console.log('✅ Usuario alumno autenticado, no se registra visita externa');
+        return res.json({ msg: 'Visita no registrada para usuarios internos' });
+      }
+    } catch (err) {
+      console.log('❌ Token inválido, tratando como visita externa');
+    }
+  } else {
+    console.log('ℹ️ No hay token en la solicitud');
+  }
+
+  // Verificar si el correo pertenece a un alumno registrado
+  try {
+    const alumnoExistente = await Alumno.findOne({ correo });
+    if (alumnoExistente) {
+      console.log('✅ Correo pertenece a un alumno registrado, no se registra visita externa');
+      return res.json({ msg: 'Visita no registrada para usuarios internos' });
+    }
+  } catch (err) {
+    console.error('❌ Error al verificar alumno:', err);
+    // Continuar si hay error, para no bloquear
+  }
+
   try {
     const nuevaVisita = new Visita({ nombre, correo, whatsapp });
     await nuevaVisita.save();
