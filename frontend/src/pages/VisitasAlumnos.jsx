@@ -6,7 +6,6 @@ const API_BASE = 'https://chatbots-educativos3-vhfq.onrender.com';
 
 function VisitasAlumnos() {
   const [visitas, setVisitas] = useState([]);
-  const [descargando, setDescargando] = useState(false);
 
   useEffect(() => {
     const fetchVisitasAlumnos = async () => {
@@ -23,10 +22,6 @@ function VisitasAlumnos() {
     fetchVisitasAlumnos();
   }, []);
 
-  const descargarExcel = async () => {
-    // TODO: Implementar una ruta de exportación específica para alumnos si es necesario.
-    alert('La exportación para esta vista aún no está implementada.');
-  };
 
   return (
     <div className="visitas-container">

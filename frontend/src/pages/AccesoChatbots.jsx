@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import "../styles/AccesoChatbots.css";
 import EditChatbotModal from "./EditChatbotModal";
 
@@ -98,7 +98,7 @@ export default function AccesoChatbots() {
     }
   }
 
-  async function cargarBots(catName) {
+  const cargarBots = useCallback(async (catName) => {
     if (!catName) { setBots([]); return; }
     setCargandoBots(true);
     try {
@@ -112,7 +112,7 @@ export default function AccesoChatbots() {
     } finally {
       setCargandoBots(false);
     }
-  }
+  }, [headers]);
 
   /* ====== init ====== */
   useEffect(() => {
@@ -122,7 +122,7 @@ export default function AccesoChatbots() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => { if (selCat) cargarBots(selCat); }, [selCat]);
+  useEffect(() => { if (selCat) cargarBots(selCat); }, [selCat, cargarBots]);
 
   /* ====== acciones ====== */
   async function crearCategoria() {
@@ -213,7 +213,7 @@ export default function AccesoChatbots() {
 
   async function eliminarCategoria(nombre) {
     if (!nombre) return;
-    if (!window.confirm(`¿Eliminar la categoría \"${nombre}\"?\nSolo se permite eliminar categorías vacías.`)) return;
+    if (!window.confirm(`¿Eliminar la categoría "${nombre}"?\nSolo se permite eliminar categorías vacías.`)) return;
     try {
       const res = await fetch(`${API_BASE}/chatbot-categorias/${encodeURIComponent(nombre)}`, {
         method: "DELETE",
@@ -275,6 +275,7 @@ export default function AccesoChatbots() {
         {selectedBot.iframeUrl ? (
           <div className="iframe-container">
             <iframe
+              title={`Chatbot: ${selectedBot.nombre}`}
               src={selectedBot.iframeUrl}
               width="100%"
               height="900px"

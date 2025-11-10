@@ -1,5 +1,4 @@
 // src/utils/localVault.js
-const VERSION = "v1";
 const PASSPHRASE = "APP_LOCAL_VAULT_v1"; // cámbiala por una propia
 
 function arrToB64(a){ return btoa(String.fromCharCode(...new Uint8Array(a))); }

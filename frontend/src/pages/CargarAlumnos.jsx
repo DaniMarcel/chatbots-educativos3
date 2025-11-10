@@ -27,7 +27,7 @@ const toKey = (s = "") =>
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[\s_\-]+/g, "");
+    .replace(/[\s_-]+/g, "");
 
 const ALIASES = {
   correo: ["correo", "correo electronico", "email", "e-mail", "mail"],
@@ -127,7 +127,7 @@ function normalizeFechaIngreso(v) {
 
 function CargarAlumno() {
   const [rows, setRows] = useState([]);
-  const [detectedCols, setDetectedCols] = useState([]);
+  const [, setDetectedCols] = useState([]);
   const [badRows, setBadRows] = useState([]);
   const [subiendo, setSubiendo] = useState(false);
   const [progreso, setProgreso] = useState(0);
@@ -317,6 +317,7 @@ function CargarAlumno() {
           const idx = i++;
           const row = rows[idx];
           inFlight++;
+          // eslint-disable-next-line no-loop-func
           (async () => {
             try {
               await enviarFila(row);

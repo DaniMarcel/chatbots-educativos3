@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/PanelAlumno.css';
 
@@ -19,7 +19,7 @@ const API_BASE = `${API_ROOT}/api`;
 function getYouTubeID(url) {
   if (!url) return '';
   const arr = url.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
-  return (arr[2] !== undefined) ? arr[2].split(/[^0-9a-z_\-]/i)[0] : arr[0];
+  return (arr[2] !== undefined) ? arr[2].split(/[^0-9a-z_-]/i)[0] : arr[0];
 }
 
 export default function PanelAlumno() {
@@ -43,32 +43,7 @@ export default function PanelAlumno() {
   // Estado para videos expandidos
   const [expandedVideoCat, setExpandedVideoCat] = useState({}); // { [categoria]: true }
 
-  // Altura fija razonable para el iframe
-  const FRAME_HEIGHT = 900;
-
-  /* ===== Montaje ===== */
-  useEffect(() => {
-    const raw = localStorage.getItem('usuario');
-    if (raw) { try { setUsuario(JSON.parse(raw)); } catch {} }
-    refetchUsuario();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // refrescar al volver a la pestaña
-  useEffect(() => {
-    const onVisible = () => document.visibilityState === 'visible' && refetchUsuario();
-    document.addEventListener('visibilitychange', onVisible);
-    return () => document.removeEventListener('visibilitychange', onVisible);
-  }, []);
-
-  // Carga todo al tener usuario
-  useEffect(() => {
-    if (usuario?._id) fetchPermitidos();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [usuario?._id]);
-
-  /* ===== Fetchers ===== */
-  async function refetchUsuario() {
+  const refetchUsuario = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) { navigate('/login'); return; }
@@ -89,8 +64,29 @@ export default function PanelAlumno() {
       setUsuario(fresh);
       localStorage.setItem('usuario', JSON.stringify(fresh));
     } catch { /* noop */ }
-  }
+  }, [navigate]);
 
+  /* ===== Montaje ===== */
+  useEffect(() => {
+    const raw = localStorage.getItem('usuario');
+    if (raw) { try { setUsuario(JSON.parse(raw)); } catch {} }
+    refetchUsuario();
+  }, [refetchUsuario]);
+
+  // refrescar al volver a la pestaña
+  useEffect(() => {
+    const onVisible = () => document.visibilityState === 'visible' && refetchUsuario();
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [refetchUsuario]);
+
+  // Carga todo al tener usuario
+  useEffect(() => {
+    if (usuario?._id) fetchPermitidos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usuario?._id]);
+
+  /* ===== Fetchers ===== */
   async function fetchPermitidos() {
     setLoading(true);
     try {
@@ -204,6 +200,11 @@ export default function PanelAlumno() {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const activeChatbot = useMemo(() =>
+    activeIframeSrc ? permitidos.find(p => p.embedUrl === activeIframeSrc) : null,
+    [activeIframeSrc, permitidos]
+  );
+
   /* ===== UI ===== */
   return (
     <div className="al-theme">
@@ -293,6 +294,7 @@ export default function PanelAlumno() {
                 }}
               >
                 <iframe
+                  title={activeChatbot?.nombre || 'Chatbot'}
                   src={activeIframeSrc}
                   width="100%"
                   height="100%"
