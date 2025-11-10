@@ -33,8 +33,6 @@ export default function PanelAlumno() {
   const [loading, setLoading] = useState(false);
   const [lastLoadedAt, setLastLoadedAt] = useState(null);
 
-  // Estado de acordeón por categoría
-  const [expandedCat, setExpandedCat] = useState({}); // { [categoria]: true }
 
   // Estado para el iframe activo (para evitar recargas)
   const [activeIframeSrc, setActiveIframeSrc] = useState(() => {
@@ -180,15 +178,7 @@ export default function PanelAlumno() {
     ), [permitidos]);
 
   /* ===== Agrupar por categoría ===== */
-  const gruposChatbots = useMemo(() => {
-    const map = new Map();
-    for (const cb of chatbots) {
-      const k = cb.categoria || 'General';
-      if (!map.has(k)) map.set(k, []);
-      map.get(k).push(cb);
-    }
-    return Array.from(map.entries()).sort((a,b)=> a[0].localeCompare(b[0], 'es'));
-  }, [chatbots]);
+
 
   const gruposVideos = useMemo(() => {
     const map = new Map();
@@ -200,21 +190,7 @@ export default function PanelAlumno() {
     return Array.from(map.entries()).sort((a,b)=> a[0].localeCompare(b[0], 'es'));
   }, [videos]);
 
-  const toggleCat = (categoria) => {
-    const open = !expandedCat[categoria];
-    setExpandedCat(s => ({ ...s, [categoria]: open }));
-    // Si abres, establece el iframe activo (solo el primero de la categoría)
-    if (open) {
-      const items = gruposChatbots.find(([cat]) => cat === categoria)?.[1] || [];
-      const first = items[0];
-      if (first?.embedUrl) {
-        setActiveIframeSrc(first.embedUrl);
-      }
-    } else {
-      // Si cierras, no cambies el src para mantener la conversación
-      // Solo oculta visualmente
-    }
-  };
+
 
   // Función para actualizar activeIframeSrc y guardar en localStorage
   const updateActiveIframeSrc = (src) => {
@@ -298,7 +274,7 @@ export default function PanelAlumno() {
                 width: '100%',
                 height: '100%',
                 zIndex: 1000,
-                display: (seccion === 'chatbots' && Object.values(expandedCat).some(Boolean)) ? 'block' : 'none',
+                display: (seccion === 'chatbots' && activeIframeSrc) ? 'block' : 'none',
                 background: 'rgba(0,0,0,0.5)',
                 padding: '20px',
                 boxSizing: 'border-box'
@@ -326,26 +302,31 @@ export default function PanelAlumno() {
                   key={activeIframeSrc} // Cambia solo si cambia el src
                 />
                 <button
-                  onClick={() => setExpandedCat({})} // Cierra todos los acordeones
+                  onClick={() => updateActiveIframeSrc(null)}
                   style={{
                     position: 'absolute',
                     top: '15px',
                     right: '15px',
-                    background: 'rgba(0,0,0,0.5)',
+                    zIndex: 10,
+                    background: 'rgba(0, 0, 0, 0.5)',
                     color: 'white',
                     border: 'none',
                     borderRadius: '50%',
-                    width: '30px',
-                    height: '30px',
-                    lineHeight: '30px',
-                    textAlign: 'center',
-                    padding: 0,
+                    width: '40px',
+                    height: '40px',
                     cursor: 'pointer',
-                    zIndex: 10 // Asegura que esté por encima del iframe
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '24px',
+                    lineHeight: '1',
+                    fontWeight: 'bold',
                   }}
+                  aria-label="Cerrar chatbot"
                 >
                   &times;
                 </button>
+
               </div>
             </div>
           )}
@@ -395,45 +376,30 @@ export default function PanelAlumno() {
 
               {loading ? (
                 <p className="empty">Cargando chatbots…</p>
-              ) : (gruposChatbots.length ? (
+              ) : (chatbots.length ? (
                 <div className="cb-groups list">
-                  {gruposChatbots.map(([categoria, items]) => {
-                    const open = !!expandedCat[categoria];
+                  {chatbots.map((chatbot) => {
+                    const open = activeIframeSrc === chatbot.embedUrl;
                     return (
-                      <div className="cb-group" key={categoria} style={{marginBottom:16}}>
-                        {/* Encabezado de categoría */}
+                      <div className="cb-group" key={chatbot._id} style={{marginBottom:16}}>
                         <div className="cb-group-title" style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:12}}>
                           <div>
-                            <strong>{categoria}</strong> <span className="chip">{items.length}</span>
+                            <strong>{chatbot.nombre}</strong>
                             <div className="muted small" style={{marginTop:4}}>
-                              {items.map(x => x.nombre).join(' • ')}
+                              {chatbot.categoria}
                             </div>
                           </div>
-                          <button className="btn btn-primary" onClick={() => toggleCat(categoria)}>
+                          <button className="btn btn-primary" onClick={() => {
+                            const newSrc = open ? null : chatbot.embedUrl;
+                            updateActiveIframeSrc(newSrc);
+                            if (!newSrc) {
+                              // Si cerramos el chatbot, reseteamos el estado de expansión de videos
+                              setExpandedVideoCat({});
+                            }
+                          }}>
                             {open ? 'Cerrar' : 'Acceder'}
                           </button>
                         </div>
-
-                        {/* El iframe ahora es persistente, así que aquí solo mostramos un placeholder o nada */}
-                        {!open && (
-                          <div className="muted small" style={{marginTop: 8}}>
-                            Haz clic en "Acceder" para abrir el chatbot.
-                          </div>
-                        )}
-
-                        {/* Opcional: Videos asociados dentro del acordeón abierto */}
-                        {open && items[0]?.videos && items[0].videos.length > 0 && (
-                          <div className="muted small" style={{marginTop: 8}}>
-                            <strong>Videos asociados:</strong>
-                            <ul>
-                              {items[0].videos.map((v, idx) => (
-                                <li key={idx}>
-                                  <a href={v.url} target="_blank" rel="noopener noreferrer">{v.nombre}</a>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
                       </div>
                     );
                   })}
