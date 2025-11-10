@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // 🧩 Páginas
 import Login from './pages/Login';
@@ -14,8 +14,6 @@ import PaginaPrincipal from './pages/PaginaPrincipal';
 import LoginInvitado from './pages/LoginInvitado';
 import ResetPassword from './pages/ResetPassword';
  
-
-
 // 🔐 Ruta protegida
 import RutaProtegida from './components/RutaProtegida';
 

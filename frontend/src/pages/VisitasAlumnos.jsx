@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import * as XLSX from 'xlsx';
 import '../styles/VisitasRegistradas.css'; // Reutilizamos los mismos estilos
 
 const API_BASE = 'https://chatbots-educativos3-vhfq.onrender.com';

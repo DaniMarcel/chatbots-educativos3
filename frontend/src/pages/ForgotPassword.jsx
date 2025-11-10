@@ -1,5 +1,4 @@
-// src/pages/ForgotPassword.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 const API_BASE = (process.env.REACT_APP_API_ROOT || 'https://chatbots-educativos3-vhfq.onrender.com') + '/api';
 
 export default function ForgotPassword() {

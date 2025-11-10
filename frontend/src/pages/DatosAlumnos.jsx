@@ -1,5 +1,5 @@
 // src/pages/DatosAlumnos.jsx
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import EditAlumnoModal from "./EditAlumnoModal.jsx";
 
 console.log("DatosAlumnos render");

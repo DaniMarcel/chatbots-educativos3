@@ -1,5 +1,5 @@
 // src/pages/CursosProfesor.jsx
-import React, { useEffect, useMemo, useState, useCallback, useRef } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import "../styles/CursosProfesor.css";
 
 console.log("CursosProfesor render");
