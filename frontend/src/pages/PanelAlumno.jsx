@@ -200,11 +200,6 @@ export default function PanelAlumno() {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const activeChatbot = useMemo(() =>
-    activeIframeSrc ? permitidos.find(p => p.embedUrl === activeIframeSrc) : null,
-    [activeIframeSrc, permitidos]
-  );
-
   /* ===== UI ===== */
   return (
     <div className="al-theme">
