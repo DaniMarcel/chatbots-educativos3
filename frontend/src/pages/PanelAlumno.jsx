@@ -264,207 +264,152 @@ export default function PanelAlumno() {
           </header>
 
           <main className="al-main">
-            {/* Iframe persistente: siempre renderizado, visible solo en chatbots con acordeón abierto */}
-            {activeIframeSrc && (
-              <div
-                className="persistent-iframe"
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                zIndex: 1000,
-                display: (seccion === 'chatbots' && activeIframeSrc) ? 'block' : 'none',
-                background: 'rgba(0,0,0,0.5)',
-                padding: '20px',
-                boxSizing: 'border-box'
-              }}
-            >
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  maxWidth: '1200px',
-                  margin: '0 auto',
-                  background: 'white',
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                  position: 'relative' // Añadido para el posicionamiento del botón
-                }}
-              >
-                <iframe
-                  title={activeChatbot?.nombre || 'Chatbot'}
-                  src={activeIframeSrc}
-                  width="100%"
-                  height="100%"
-                  frameBorder="0"
-                  allow="clipboard-write; microphone; camera"
-                  sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-                  key={activeIframeSrc} // Cambia solo si cambia el src
-                />
-                <button
-                  onClick={() => updateActiveIframeSrc(null)}
-                  style={{
-                    position: 'absolute',
-                    top: '15px',
-                    right: '15px',
-                    zIndex: 10,
-                    background: 'rgba(0, 0, 0, 0.5)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '50%',
-                    width: '40px',
-                    height: '40px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '24px',
-                    lineHeight: '1',
-                    fontWeight: 'bold',
-                  }}
-                  aria-label="Cerrar chatbot"
-                >
-                  &times;
-                </button>
-
-              </div>
-            </div>
-          )}
-
-          {seccion === 'perfil' && usuario && (
-            <div className="cards-grid">
-              <section className="card">
-                <h3 className="card-title">Información Personal</h3>
-                <div className="kv-grid">
-                  <div className="kv"><span className="k">Nombre</span><span className="v">{usuario.nombre} {usuario.apellido}</span></div>
-                  <div className="kv"><span className="k">Documento</span><span className="v">{usuario.tipo_documento} {usuario.numero_documento}</span></div>
-                  <div className="kv"><span className="k">Jornada</span><span className="v">{usuario.jornada}</span></div>
-                  <div className="kv"><span className="k">Semestre</span><span className="v">{usuario.semestre}</span></div>
-                </div>
-              </section>
-
-              <section className="card">
-                <h3 className="card-title">Información de Contacto</h3>
-                <div className="kv-grid">
-                  <div className="kv"><span className="k">Correo</span><span className="v">{usuario.correo}</span></div>
-                  <div className="kv"><span className="k">Teléfono</span><span className="v">{usuario.telefono || 'No registrado'}</span></div>
-                </div>
-              </section>
-
-              <section className="card span-2">
-                <h3 className="card-title">Información de deuda</h3>
-                <div className="kv-grid">
-                  <div className="kv">
-                    <span className="k">Estado de cuenta</span>
-                    <span className={`v ${estadoCuentaTexto === 'Suspendido' ? 'status-bad' : 'status-ok'}`}>{estadoCuentaTexto}</span>
+            {seccion === 'perfil' && usuario && (
+              <div className="cards-grid">
+                <section className="card">
+                  <h3 className="card-title">Información Personal</h3>
+                  <div className="kv-grid">
+                    <div className="kv"><span className="k">Nombre</span><span className="v">{usuario.nombre} {usuario.apellido}</span></div>
+                    <div className="kv"><span className="k">Documento</span><span className="v">{usuario.tipo_documento} {usuario.numero_documento}</span></div>
+                    <div className="kv"><span className="k">Jornada</span><span className="v">{usuario.jornada}</span></div>
+                    <div className="kv"><span className="k">Semestre</span><span className="v">{usuario.semestre}</span></div>
                   </div>
-                  <div className="kv">
-                    <span className="k">{deudaLabel}</span>
-                    <span className="v"><span className={riskClass}>{(riesgo || '—').toUpperCase()}</span></span>
+                </section>
+
+                <section className="card">
+                  <h3 className="card-title">Información de Contacto</h3>
+                  <div className="kv-grid">
+                    <div className="kv"><span className="k">Correo</span><span className="v">{usuario.correo}</span></div>
+                    <div className="kv"><span className="k">Teléfono</span><span className="v">{usuario.telefono || 'No registrado'}</span></div>
                   </div>
-                </div>
-              </section>
-            </div>
-          )}
+                </section>
 
-          {seccion === 'chatbots' && (
-            <section className="card">
-              <div className="card-head">
-                <h3 className="card-title">Chatbots Asignados</h3>
-                {lastLoadedAt && <span className="hint small">Actualizado: {lastLoadedAt.toLocaleTimeString()}</span>}
+                <section className="card span-2">
+                  <h3 className="card-title">Información de deuda</h3>
+                  <div className="kv-grid">
+                    <div className="kv">
+                      <span className="k">Estado de cuenta</span>
+                      <span className={`v ${estadoCuentaTexto === 'Suspendido' ? 'status-bad' : 'status-ok'}`}>{estadoCuentaTexto}</span>
+                    </div>
+                    <div className="kv">
+                      <span className="k">{deudaLabel}</span>
+                      <span className="v"><span className={riskClass}>{(riesgo || '—').toUpperCase()}</span></span>
+                    </div>
+                  </div>
+                </section>
               </div>
+            )}
 
-              {loading ? (
-                <p className="empty">Cargando chatbots…</p>
-              ) : (chatbots.length ? (
-                <div className="cb-groups list">
-                  {chatbots.map((chatbot) => {
-                    const open = activeIframeSrc === chatbot.embedUrl;
-                    return (
-                      <div className="cb-group" key={chatbot._id} style={{marginBottom:16}}>
-                        <div className="cb-group-title" style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:12}}>
-                          <div>
-                            <strong>{chatbot.nombre}</strong>
-                            <div className="muted small" style={{marginTop:4}}>
-                              {chatbot.categoria}
-                            </div>
-                          </div>
-                          <button className="btn btn-primary" onClick={() => {
-                            const newSrc = open ? null : chatbot.embedUrl;
-                            updateActiveIframeSrc(newSrc);
-                            if (!newSrc) {
-                              // Si cerramos el chatbot, reseteamos el estado de expansión de videos
-                              setExpandedVideoCat({});
-                            }
-                          }}>
-                            {open ? 'Cerrar' : 'Acceder'}
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+            {seccion === 'chatbots' && (
+              <section className="card">
+                <div className="card-head">
+                  <h3 className="card-title">Chatbots Asignados</h3>
+                  {lastLoadedAt && <span className="hint small">Actualizado: {lastLoadedAt.toLocaleTimeString()}</span>}
                 </div>
-              ) : (
-                <p className="empty">No tienes chatbots asignados aún.</p>
-              ))}
-            </section>
-          )}
 
-          {seccion === 'otros' && (
-            <section className="card">
-              <h3 className="card-title">Videos Educativos</h3>
-              
-              {loading ? (
-                <p className="empty">Cargando videos…</p>
-              ) : (gruposVideos.length ? (
-                <div className="cb-groups list">
-                  {gruposVideos.map(([categoria, items]) => {
-                    const open = !!expandedVideoCat[categoria];
-                    return (
-                      <div className="cb-group" key={categoria} style={{marginBottom: 24}}>
-                        <div className="cb-group-title">
-                          <strong>{categoria}</strong> <span className="chip">{items.length}</span>
-                        </div>
-                        {!open && (
-                          <button className="btn btn-primary" onClick={() => setExpandedVideoCat(s => ({ ...s, [categoria]: true }))}>
-                            Acceder
-                          </button>
-                        )}
-                        {open && (
-                          <>
-                            <button className="btn btn-secondary" onClick={() => setExpandedVideoCat(s => ({ ...s, [categoria]: false }))}>
-                              Esconder
-                            </button>
-                            {items.map(video => (
-                              <div key={`${video.chatbotId}-${video.nombre}`} style={{marginTop: 16}}>
-                                <h4 style={{marginBottom: 8}}>{video.nombre} (de {video.chatbotNombre})</h4>
-                                <div style={{position: 'relative', paddingTop: '56.25%'}}>
-                                  <iframe
-                                    style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}}
-                                    src={`https://www.youtube.com/embed/${getYouTubeID(video.url)}`}
-                                    title={video.nombre}
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                  />
-                                </div>
+                {loading ? (
+                  <p className="empty">Cargando chatbots…</p>
+                ) : (chatbots.length ? (
+                  <div className="cb-groups list">
+                    {chatbots.map((chatbot) => {
+                      const open = activeIframeSrc === chatbot.embedUrl;
+                      return (
+                        <div className="cb-group" key={chatbot._id} style={{marginBottom:16}}>
+                          <div className="cb-group-title" style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:12}}>
+                            <div>
+                              <strong>{chatbot.nombre}</strong>
+                              <div className="muted small" style={{marginTop:4}}>
+                                {chatbot.categoria}
                               </div>
-                            ))}
-                          </>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="empty">No tienes videos asignados aún.</p>
-              ))}
-            </section>
-          )}
-        </main>
-      </div>
+                            </div>
+                            <button className="btn btn-primary" onClick={() => {
+                              const newSrc = open ? null : chatbot.embedUrl;
+                              updateActiveIframeSrc(newSrc);
+                              if (!newSrc) {
+                                // Si cerramos el chatbot, reseteamos el estado de expansión de videos
+                                setExpandedVideoCat({});
+                              }
+                            }}>
+                              {open ? 'Cerrar' : 'Acceder'}
+                            </button>
+                          </div>
+                          {open && (
+                            <div style={{ marginTop: '16px', height: '600px', width: '100%' }}>
+                              <iframe
+                                title={chatbot.nombre}
+                                src={chatbot.embedUrl}
+                                width="100%"
+                                height="100%"
+                                frameBorder="0"
+                                allow="clipboard-write; microphone; camera"
+                                sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                                key={chatbot.embedUrl}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="empty">No tienes chatbots asignados aún.</p>
+                ))}
+              </section>
+            )}
+
+            {seccion === 'otros' && (
+              <section className="card">
+                <h3 className="card-title">Videos Educativos</h3>
+                
+                {loading ? (
+                  <p className="empty">Cargando videos…</p>
+                ) : (gruposVideos.length ? (
+                  <div className="cb-groups list">
+                    {gruposVideos.map(([categoria, items]) => {
+                      const open = !!expandedVideoCat[categoria];
+                      return (
+                        <div className="cb-group" key={categoria} style={{marginBottom: 24}}>
+                          <div className="cb-group-title">
+                            <strong>{categoria}</strong> <span className="chip">{items.length}</span>
+                          </div>
+                          {!open && (
+                            <button className="btn btn-primary" onClick={() => setExpandedVideoCat(s => ({ ...s, [categoria]: true }))}>
+                              Acceder
+                            </button>
+                          )}
+                          {open && (
+                            <>
+                              <button className="btn btn-secondary" onClick={() => setExpandedVideoCat(s => ({ ...s, [categoria]: false }))}>
+                                Esconder
+                              </button>
+                              {items.map(video => (
+                                <div key={`${video.chatbotId}-${video.nombre}`} style={{marginTop: 16}}>
+                                  <h4 style={{marginBottom: 8}}>{video.nombre} (de {video.chatbotNombre})</h4>
+                                  <div style={{position: 'relative', paddingTop: '56.25%'}}>
+                                    <iframe
+                                      style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}}
+                                      src={`https://www.youtube.com/embed/${getYouTubeID(video.url)}`}
+                                      title={video.nombre}
+                                      frameBorder="0"
+                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                      allowFullScreen
+                                    />
+                                  </div>
+                                </div>
+                              ))}
+                            </>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="empty">No tienes videos asignados aún.</p>
+                ))}
+              </section>
+            )}
+          </main>
+        </div>
       </div>
     </div>
   );
