@@ -329,7 +329,7 @@ export default function PanelAlumno() {
                             </button>
                           </div>
                           {open && (
-                            <div style={{ marginTop: '16px', height: '600px', width: '100%' }}>
+                            <div style={{ marginTop: '16px', height: '800px', width: '100%' }}>
                               <iframe
                                 title={chatbot.nombre}
                                 src={chatbot.embedUrl}
