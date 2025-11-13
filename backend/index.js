@@ -15,6 +15,7 @@ app.disable("x-powered-by");
 
 /* ====== CORS ====== */
 const ALLOWED_STATIC = new Set([
+  "capacitor://localhost", // Origen para Capacitor en Android/iOS
   "https://localhost", // Para apps nativas con Capacitor
   "http://localhost",
   "http://localhost:3000",
