@@ -22,6 +22,8 @@ const ALLOWED_STATIC = new Set([
   "http://localhost:3001",
   "http://localhost:5173",
   "https://chatbots-educativos3.vercel.app",
+  "null", // Origen vacío común en WebViews móviles
+  "file://", // Para archivos locales en apps
 ]);
 
 if (process.env.FRONT_URL) {
@@ -32,7 +34,7 @@ if (process.env.FRONT_URL) {
 }
 
 function isAllowedOrigin(origin) {
-  if (!origin) return true;
+  if (!origin) return true; // Permitir orígenes vacíos
   if (ALLOWED_STATIC.has(origin)) return true;
   if (/^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(origin)) return true;
   if (/^https:\/\/[a-z0-9-]+\.onrender\.com$/i.test(origin)) return true;
