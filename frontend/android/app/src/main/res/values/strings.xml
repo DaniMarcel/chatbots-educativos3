@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">masoterapiaApp</string>
+    <string name="title_activity_main">masoterapiaApp</string>
+    <string name="package_name">com.masoterapia.app</string>
+    <string name="custom_url_scheme">com.masoterapia.app</string>
+</resources>
