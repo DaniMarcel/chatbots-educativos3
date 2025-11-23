@@ -1,25 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { encryptLocalPassword } from '../utils/localVault';
+import useAuth from '../hooks/useAuth';
 import '../styles/Login.css';
 
 function Login() {
   const [rut, setRut] = useState('');
   const [contrasena, setContrasena] = useState('');
-  const [rol, setRol] = useState('alumno');           // 'alumno' | 'profesor'
+  const [rol, setRol] = useState('alumno'); // 'alumno' | 'profesor'
   const [mensaje, setMensaje] = useState('');
   const [verPwd, setVerPwd] = useState(false);
 
   // recovery side-panel state (solo para profesor/admin)
   const [recoveryOpen, setRecoveryOpen] = useState(false);
   const [recEmail, setRecEmail] = useState('');
-  const [recSending, setRecSending] = useState(false);
   const [recResult, setRecResult] = useState(null);
 
   const navigate = useNavigate();
-  const API_BASE = process.env.REACT_APP_API_BASE || 'https://chatbots-educativos3-vhfq.onrender.com/api';
-  const SESSION_MS = 30 * 60 * 1000; // 30 min
+  const { login, recuperarContrasena, loading, error, setError } = useAuth();
 
   const normalizarRut = (v) => v.replace(/\./g, '').replace(/\s+/g, '').toUpperCase();
 
@@ -33,6 +30,18 @@ function Login() {
     }
   }, [rol]);
 
+  // Mostrar error del hook si existe
+  useEffect(() => {
+    if (error) {
+      setMensaje(error);
+      const timer = setTimeout(() => {
+        setMensaje('');
+        setError(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, setError]);
+
   /* ---------------- LOGIN ---------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,79 +49,33 @@ function Login() {
     const rutLimpio = normalizarRut(rut);
     const contrasenaLimpia = contrasena.trim();
 
-    try {
-      let res;
-
-      if (rol === 'alumno') {
-        if (!rutLimpio) {
-          setMensaje('Ingresa tu RUT.');
-          setTimeout(() => setMensaje(''), 2500);
-          return;
-        }
-        res = await axios.post(`${API_BASE}/login`, { rut: rutLimpio });
-      } else {
-        if (!rutLimpio || !contrasenaLimpia) {
-          setMensaje('Ingresa RUT y contraseña.');
-          setTimeout(() => setMensaje(''), 2500);
-          return;
-        }
-        res = await axios.post(`${API_BASE}/admin/login`, {
-          rut: rutLimpio,
-          contrasena: contrasenaLimpia,
-        });
+    if (rol === 'alumno') {
+      if (!rutLimpio) {
+        setMensaje('Ingresa tu RUT.');
+        setTimeout(() => setMensaje(''), 2500);
+        return;
       }
-
-      const usuario = res.data.alumno || res.data.admin;
-      const token = res.data.token;
-
-      // Guarda sesión
-      localStorage.setItem('token', token);
-      localStorage.setItem('usuario', JSON.stringify(usuario));
-      localStorage.setItem('sessionExpiresAt', String(Date.now() + SESSION_MS));
-
-      // Guarda contraseña cifrada (solo profesor/admin)
-      if (rol !== 'alumno') {
-        try {
-          const salt = usuario?._id || usuario?.correo || usuario?.rut || rutLimpio || 'anon';
-          const enc = await encryptLocalPassword(contrasenaLimpia, salt);
-          if (enc) localStorage.setItem('password_enc', enc);
-        } catch {}
-        localStorage.removeItem('password');
-        localStorage.removeItem('pwd');
-        localStorage.removeItem('pass');
-      } else {
-        localStorage.removeItem('password_enc');
+    } else {
+      if (!rutLimpio || !contrasenaLimpia) {
+        setMensaje('Ingresa RUT y contraseña.');
+        setTimeout(() => setMensaje(''), 2500);
+        return;
       }
-
-      // Redirección según rol
-      if (rol === 'alumno') {
-        navigate('/panel-alumno');
-      } else {
-        const tipo = usuario.rol;
-        if (tipo === 'superadmin') navigate('/panel-admin');
-        else if (tipo === 'profesor' || tipo === 'admin') navigate('/panel-profesor');
-        else {
-          setMensaje('Rol no reconocido');
-          setTimeout(() => setMensaje(''), 3000);
-        }
-      }
-    } catch (err) {
-      const errorMsg = err.response?.data?.msg || 'Error al iniciar sesión';
-      setMensaje(errorMsg);
-      setTimeout(() => setMensaje(''), 3000);
     }
+
+    await login(rutLimpio, contrasenaLimpia, rol);
   };
 
   /* ---------------- RECOVERY (side-panel) ---------------- */
   const openRecovery = (initialEmail = '') => {
-    // Solo para profesor/admin
     if (rol === 'alumno') return;
     setRecEmail(initialEmail);
     setRecResult(null);
     setRecoveryOpen(true);
   };
+
   const closeRecovery = () => {
-    if (recSending) return;
+    if (loading) return;
     setRecoveryOpen(false);
     setRecEmail('');
     setRecResult(null);
@@ -130,23 +93,8 @@ function Login() {
       return;
     }
 
-    try {
-      setRecSending(true);
-      setRecResult(null);
-
-      // Ruta correcta del backend y payload { correo }
-      const res = await axios.post(`${API_BASE}/password/forgot`, {
-        correo: recEmail
-      });
-
-      const msg = res.data?.msg || 'Si existe, se envió un email con instrucciones.';
-      setRecResult({ ok: true, msg });
-    } catch (err) {
-      const errText = err.response?.data?.msg || err.message || 'Error enviando email';
-      setRecResult({ ok: false, msg: String(errText) });
-    } finally {
-      setRecSending(false);
-    }
+    const result = await recuperarContrasena(recEmail);
+    setRecResult({ ok: result.success, msg: result.message });
   }
 
   /* ---------------- JSX ---------------- */
@@ -215,7 +163,9 @@ function Login() {
             </div>
           )}
 
-          <button type="submit">Ingresar</button>
+          <button type="submit" disabled={loading}>
+            {loading ? 'Ingresando...' : 'Ingresar'}
+          </button>
         </form>
 
         {/* Link de recuperación: SOLO profesor/admin */}
@@ -263,17 +213,17 @@ function Login() {
                 <button
                   className="btn btn-pr"
                   onClick={closeRecovery}
-                  disabled={recSending}
+                  disabled={loading}
                 >
                   Cancelar
                 </button>
                 <button
                   className="btn btn-primary"
                   onClick={handleSendRecovery}
-                  disabled={recSending}
+                  disabled={loading}
                   title={!validateEmail(recEmail) ? 'Ingresa un correo válido' : 'Enviar instrucciones'}
                 >
-                  {recSending ? 'Enviando...' : 'Enviar'}
+                  {loading ? 'Enviando...' : 'Enviar'}
                 </button>
               </div>
 

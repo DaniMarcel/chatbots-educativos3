@@ -1,4 +1,9 @@
+export const nombreDe = (a) => [a?.nombre, a?.apellido ?? a?.apellidos].filter(Boolean).join(" ") || "—";
+export const docDe = (a) => a?.numero_documento ?? a?.rut ?? "—";
+
 export const getApellido = (u) => u?.apellido ?? u?.apellidos ?? u?.lastName ?? u?.lastname ?? '';
+
+export const JORNADAS = ['Mañana', 'Tarde', 'Vespertino', 'Viernes', 'Sábados', 'Blearning', 'Online', 'Otras'];
 
 /* === Catálogo de permisos para PROFESORES (para el editor) === */
 export const PERMISOS = [

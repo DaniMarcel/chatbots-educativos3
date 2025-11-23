@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
 import '../styles/RegistroAlumno.css';
 import Swal from 'sweetalert2';
+import useAuth from '../hooks/useAuth';
 
 const JORNADAS = ["Mañana", "Tarde", "Vespertino", "Viernes", "Sábados", "Blearning", "Online", "Otras"];
 
@@ -19,13 +19,25 @@ function RegistroAlumno() {
   });
 
   const [mensaje, setMensaje] = useState('');
-  const [enviando, setEnviando] = useState(false);
+  const { registroAlumno, loading, error, setError } = useAuth();
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  // Validación simple de sintaxis de email (la validación de dominio real la hace el backend)
+  // Validación simple de sintaxis de email
   const isEmailSyntaxValid = (email = '') =>
     /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(String(email).trim());
+
+  // Mostrar error del hook si existe
+  useEffect(() => {
+    if (error) {
+      setMensaje(error);
+      const timer = setTimeout(() => {
+        setMensaje('');
+        setError(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, setError]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,7 +65,6 @@ function RegistroAlumno() {
       return;
     }
 
-    // Debe coincidir con lo que valida el backend (8–12 dígitos, puede iniciar con +)
     const telOK = /^\+?\d{8,12}$/.test(String(form.telefono).trim());
     if (!telOK) {
       setMensaje('Teléfono no válido. Usa 8–12 dígitos (puede iniciar con +).');
@@ -67,7 +78,6 @@ function RegistroAlumno() {
       return;
     }
 
-    // Payload SIN contraseña: el backend genera/gestiona internamente
     const alumno = {
       correo: form.correo.trim(),
       nombre: form.nombre,
@@ -78,29 +88,11 @@ function RegistroAlumno() {
       telefono: String(form.telefono).trim(),
       semestre: Number(form.semestre),
       jornada: form.jornada
-      // 'anio' y 'rut' los resuelve el backend
-      // 'contrasena' ya no se envía
     };
 
-    try {
-      setEnviando(true);
-      const API_BASE = 'https://chatbots-educativos3-vhfq.onrender.com';
-      const token = localStorage.getItem('token');
+    const result = await registroAlumno(alumno);
 
-      if (!token) {
-        setMensaje('Tu sesión expiró. Vuelve a iniciar sesión.');
-        setTimeout(() => {
-          localStorage.clear();
-          window.location.href = '/login';
-        }, 1200);
-        return;
-      }
-
-      await axios.post(`${API_BASE}/api/registro`, alumno, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      // ✅ Ya no mostramos la contraseña
+    if (result.success) {
       Swal.fire({
         icon: 'success',
         title: 'Alumno registrado',
@@ -119,21 +111,14 @@ function RegistroAlumno() {
         semestre: '',
         jornada: ''
       });
-    } catch (err) {
-      const status = err.response?.status;
-      if (status === 401 || status === 403) {
-        setMensaje('Tu sesión expiró o no tienes permisos.');
+    } else {
+      // El error ya se maneja en el useEffect
+      if (result.message.includes('Sesión expirada')) {
         setTimeout(() => {
           localStorage.clear();
           window.location.href = '/login';
         }, 1200);
-      } else {
-        // Mostramos el mensaje del backend (incluye errores de dominio no válido)
-        setMensaje(err.response?.data?.msg || 'Error al registrar alumno');
-        setTimeout(() => setMensaje(''), 3000);
       }
-    } finally {
-      setEnviando(false);
     }
   };
 
@@ -166,8 +151,8 @@ function RegistroAlumno() {
             form.tipo_documento === 'RUT'
               ? 'Ej: 12345678-9'
               : form.tipo_documento === 'DNI'
-              ? 'Ej: 12345678'
-              : 'Ej: AB1234567'
+                ? 'Ej: 12345678'
+                : 'Ej: AB1234567'
           }
           value={form.numero_documento}
           onChange={handleChange}
@@ -202,8 +187,8 @@ function RegistroAlumno() {
           {JORNADAS.map(j => <option key={j} value={j}>{j}</option>)}
         </select>
 
-        <button type="submit" disabled={enviando}>
-          {enviando ? 'Registrando…' : 'Registrar'}
+        <button type="submit" disabled={loading}>
+          {loading ? 'Registrando…' : 'Registrar'}
         </button>
       </form>
 

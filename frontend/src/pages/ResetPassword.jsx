@@ -3,17 +3,17 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/ResetPassword.css';
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'https://chatbots-educativos3-vhfq.onrender.com/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://chatbots-educativos3-vhfq.onrender.com/api';
 
 export default function ResetPassword() {
   const [sp] = useSearchParams();
   const navigate = useNavigate();
   const [pwd1, setPwd1] = useState('');
   const [pwd2, setPwd2] = useState('');
-  const [msg, setMsg]   = useState(null);
+  const [msg, setMsg] = useState(null);
   const [sending, setSending] = useState(false);
 
-  const id    = sp.get('id');
+  const id = sp.get('id');
   const token = sp.get('token');
 
   useEffect(() => {
@@ -24,8 +24,8 @@ export default function ResetPassword() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (pwd1.length < 6)  return setMsg({ ok: false, text: 'Mínimo 6 caracteres.' });
-    if (pwd1 !== pwd2)    return setMsg({ ok: false, text: 'Las contraseñas no coinciden.' });
+    if (pwd1.length < 6) return setMsg({ ok: false, text: 'Mínimo 6 caracteres.' });
+    if (pwd1 !== pwd2) return setMsg({ ok: false, text: 'Las contraseñas no coinciden.' });
 
     try {
       setSending(true);

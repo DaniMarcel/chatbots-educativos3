@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import "../styles/EditChatbotModal.css";
 
-export default function EditChatbotModal({ chatbot, onClose, onSave }) {
+export default function EditChatbotModal({ chatbot, onClose, onSave, isNew, categorias = [] }) {
   const [nombre, setNombre] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [categoria, setCategoria] = useState("");
   const [iframeUrl, setIframeUrl] = useState("");
   const [videos, setVideos] = useState([]);
   const [guardando, setGuardando] = useState(false);
@@ -10,6 +12,8 @@ export default function EditChatbotModal({ chatbot, onClose, onSave }) {
   useEffect(() => {
     if (chatbot) {
       setNombre(chatbot.nombre || "");
+      setDescripcion(chatbot.descripcion || "");
+      setCategoria(chatbot.categoria || "");
       setIframeUrl(chatbot.iframeUrl || "");
       setVideos(chatbot.videos || [{ nombre: "", url: "" }]);
     }
@@ -19,7 +23,14 @@ export default function EditChatbotModal({ chatbot, onClose, onSave }) {
     setGuardando(true);
     try {
       const videosFiltrados = videos.filter(v => v.nombre.trim() && v.url.trim());
-      await onSave({ ...chatbot, nombre, iframeUrl, videos: videosFiltrados });
+      await onSave({
+        ...chatbot,
+        nombre,
+        descripcion,
+        categoria,
+        iframeUrl,
+        videos: videosFiltrados
+      });
       onClose();
     } catch (error) {
       console.error("Error al guardar el chatbot:", error);
@@ -48,7 +59,7 @@ export default function EditChatbotModal({ chatbot, onClose, onSave }) {
   return (
     <div className="edit-modal-overlay">
       <div className="edit-modal-content">
-        <h3>Editando: {chatbot.nombre}</h3>
+        <h3>{isNew ? "Crear Chatbot" : `Editando: ${chatbot.nombre}`}</h3>
 
         <div className="form-group">
           <label>Nombre del chatbot</label>
@@ -58,6 +69,48 @@ export default function EditChatbotModal({ chatbot, onClose, onSave }) {
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
           />
+        </div>
+
+        <div className="form-group">
+          <label>Descripción</label>
+          <textarea
+            className="cb-input"
+            value={descripcion}
+            onChange={(e) => setDescripcion(e.target.value)}
+            rows={2}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Categoría</label>
+          <div className="category-selector">
+            <select
+              className="cb-input"
+              value={categorias.includes(categoria) ? categoria : "nueva"}
+              onChange={(e) => {
+                if (e.target.value === "nueva") {
+                  setCategoria("");
+                } else {
+                  setCategoria(e.target.value);
+                }
+              }}
+            >
+              <option value="" disabled>Selecciona una categoría</option>
+              {categorias.map(c => <option key={c} value={c}>{c}</option>)}
+              <option value="nueva">+ Nueva categoría...</option>
+            </select>
+
+            {(!categorias.includes(categoria) || categoria === "") && (
+              <input
+                type="text"
+                className="cb-input mt-2"
+                value={categoria}
+                onChange={(e) => setCategoria(e.target.value)}
+                placeholder="Escribe el nombre de la nueva categoría"
+                autoFocus
+              />
+            )}
+          </div>
         </div>
 
         <div className="form-group">

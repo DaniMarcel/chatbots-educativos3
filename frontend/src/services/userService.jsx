@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // TODO: Move this to an environment variable
-const API_BASE = process.env.REACT_APP_API_URL || 'https://chatbots-educativos3-vhfq.onrender.com/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://chatbots-educativos3-vhfq.onrender.com/api';
 
 const getAuthHeader = () => {
     const token = localStorage.getItem('token') || '';
