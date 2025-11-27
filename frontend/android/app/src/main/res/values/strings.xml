@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Chatbots Educativos</string>
-    <string name="title_activity_main">Chatbots Educativos</string>
+    <string name="app_name">Masoterapia</string>
+    <string name="title_activity_main">Masoterapia</string>
     <string name="package_name">com.chatbotseducativos.app</string>
     <string name="custom_url_scheme">com.chatbotseducativos.app</string>
 </resources>
