@@ -28,7 +28,7 @@ function PaginaPrincipal() {
           {/* Columna 1: Intranet */}
           <div className="columna-boton">
             <a
-              href="www.m.masoterapiachile.cl"
+              href="https://www.m.masoterapiachile.cl/intranet"
               target="_blank"
               rel="noopener noreferrer"
               className="boton-icono"
