@@ -33,23 +33,25 @@ const TEL_RE = /^\+?\d{8,12}$/;
 
 /* ===========================================================
    POST /api/login  (Alumno)
-   - Permite login con RUT (o con contraseña si existe)
+   - Permite login con RUT, Pasaporte, DNI u otro documento
 =========================================================== */
 router.post('/login', async (req, res) => {
-  const rut = normalizarRut(req.body.rut || '');
+  // Normalizar el documento ingresado (puede ser RUT, Pasaporte, DNI, etc.)
+  const docIngresado = String(req.body.rut || '').replace(/\./g, '').replace(/\s+/g, '').toUpperCase();
   const contrasena = typeof req.body.contrasena === 'string' ? req.body.contrasena.trim() : '';
 
-  if (!rut) return res.status(400).json({ msg: 'Debes ingresar el RUT' });
+  if (!docIngresado) return res.status(400).json({ msg: 'Debes ingresar tu documento de identificación' });
 
   try {
+    // Buscar por RUT tradicional, o por numero_documento (para Pasaporte, DNI, etc.)
     const alumno = await Alumno.findOne({
       $or: [
-        { rut },
-        { numero_documento: rut, tipo_documento: 'RUT' }
+        { rut: docIngresado },
+        { numero_documento: docIngresado }
       ]
     });
 
-    if (!alumno) return res.status(400).json({ msg: 'RUT no encontrado' });
+    if (!alumno) return res.status(400).json({ msg: 'Documento no encontrado' });
 
     if (contrasena) {
       const tieneHash = typeof alumno.contrasena === 'string' && alumno.contrasena.length > 0;
