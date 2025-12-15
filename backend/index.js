@@ -22,6 +22,8 @@ const ALLOWED_STATIC = new Set([
   "http://localhost:3001",
   "http://localhost:5173",
   "https://chatbots-educativos3.vercel.app",
+  "https://www.masoterapiachile-ia.cl",
+  "https://masoterapiachile-ia.cl",
   "null", // Origen vacío común en WebViews móviles
   "file://", // Para archivos locales en apps
 ]);
