@@ -27,8 +27,11 @@ export default function ChatbotDetail({ chatbot, onBack }) {
                     width="100%"
                     height="600px"
                     frameBorder="0"
-                    allow="clipboard-write; microphone; camera"
-                    sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                    allow="clipboard-write; microphone; camera; geolocation; fullscreen; autoplay; encrypted-media"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    loading="lazy"
+                    style={{ border: 'none' }}
                 />
             </div>
 
