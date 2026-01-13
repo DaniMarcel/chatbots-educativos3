@@ -472,3 +472,53 @@
   border-radius: 50%; /* Hace circular si es necesario */
   background: #f0f0f0; /* Fondo opcional */
 }
+
+/* Extra small devices (phones with width < 360px) */
+@media (max-width: 360px) {
+  .al-main {
+    padding: 8px;
+    padding-top: 65px;
+  }
+
+  .al-header {
+    padding: 10px;
+  }
+
+  .al-header .titles h1 {
+    font-size: 16px;
+  }
+
+  .subtitle {
+    font-size: 11px;
+  }
+
+  .card {
+    margin-left: -8px;
+    margin-right: -8px;
+    padding: 8px;
+    max-width: 100vw;
+    overflow: hidden;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+  }
+
+  .card .iframe-wrap,
+  .card > .iframe-wrap {
+    width: calc(100% + 16px);
+    margin: 0 -8px -8px;
+  }
+
+  .card .iframe-wrap iframe,
+  .card iframe {
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+
+  .cb-frame-wrap {
+    margin: 0 -8px -8px;
+    padding: 4px;
+    width: calc(100% + 16px);
+  }
+}
