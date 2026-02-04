@@ -141,6 +141,9 @@
   border-bottom-left-radius: var(--radius);
   border-bottom-right-radius: var(--radius);
   overflow: hidden;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
 }
 .iframe-wrap iframe {
   display: block;
@@ -158,116 +161,30 @@
 }
 
 /* ===== Responsive heights ===== */
-@media (max-width: 1024px) {
-  :root {
-    --chat-h: 700px;
-  }
+@media (max-width: 1024px){
+  :root{ --chat-h: 700px; }
 }
 @media (max-width: 768px){
   :root{ --chat-h: 620px; }
   .chat-toolbar{ padding:10px 12px; }
   .chat-open{ padding:7px 10px; font-size:14px; }
-
-  .visit-wrap {
-    overflow-x: hidden !important;
-    width: 100% !important;
-    max-width: 100vw !important;
-  }
-
-  /* Fix para scroll horizontal en tablets */
-  .iframe-wrap {
-    max-width: 100%;
-    overflow: hidden !important;
-    width: 100%;
-  }
-
-  .iframe-wrap iframe {
-    max-width: 100% !important;
-    width: 100% !important;
-    min-width: auto !important;
-  }
-
-  .chat-card {
-    width: 100%;
-    max-width: calc(100vw - 24px);
-    margin: 0 12px;
-    box-sizing: border-box;
-  }
 }
 @media (max-width: 480px){
   :root{ --chat-h: 540px; }
-
-  .visit-wrap {
-    padding: 12px 8px 24px;
-    overflow-x: hidden !important;
-    width: 100% !important;
-    max-width: 100vw !important;
-  }
-
-  /* Fix para que el chatbot no tenga scroll horizontal en móviles */
-  .iframe-wrap {
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow: hidden !important;
-    margin: 0;
-    padding: 0;
-    border-radius: 0;
-    box-sizing: border-box;
-  }
-
-  .iframe-wrap iframe {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: auto !important;
-    transform-origin: top left;
-    display: block;
-  }
-
-  .chat-card {
-    border-radius: 0;
-    margin: 0;
-    width: 100%;
-    max-width: 100vw;
-    border-left: none;
-    border-right: none;
-    box-sizing: border-box;
-  }
 }
 
-/* Extra small devices (phones with width < 360px) */
-@media (max-width: 360px) {
-  :root { --chat-h: 500px; }
-
-  .visit-wrap {
-    padding: 8px 4px 16px;
-    overflow-x: hidden !important;
-    width: 100% !important;
-    max-width: 100vw !important;
-  }
-
+/* Fix específico solo para iframe en móviles */
+@media (max-width: 768px) {
   .iframe-wrap {
-    width: 100% !important;
+    overflow-x: auto !important; /* Permitir scroll horizontal */
+    overflow-y: hidden !important;
     max-width: 100% !important;
-    margin: 0;
-    overflow: hidden !important;
-    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling en iOS */
   }
-
+  
   .iframe-wrap iframe {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-  }
-
-  .chat-card {
-    margin: 0;
-    width: 100%;
-    max-width: 100vw;
-    box-sizing: border-box;
-  }
-
-  .card-title,
-  .chat-title {
-    font-size: 15px;
+    width: 400px !important; /* Ancho mínimo del chatbot */
+    max-width: none !important;
+    min-width: 400px !important;
   }
 }
