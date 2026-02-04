@@ -14,8 +14,24 @@
   --radius: 14px;
 }
 
-.al-theme{ background:var(--bg); color:var(--fg); min-height:100vh; }
-.al-layout{ display:grid; grid-template-columns:260px 1fr; gap:22px; padding:22px; max-width:1500px; margin:0 auto; }
+.al-theme{ 
+  background:var(--bg); 
+  color:var(--fg); 
+  min-height:100vh; 
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+.al-layout{ 
+  display:grid; 
+  grid-template-columns:260px 1fr; 
+  gap:22px; 
+  padding:22px; 
+  max-width:1500px; 
+  margin:0 auto;
+  width: 100%;
+  overflow-x: hidden;
+}
 
 .al-sidebar{
   background:var(--panel); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow);
@@ -277,12 +293,24 @@
 
 /* Móvil pequeño */
 @media (max-width: 768px) {
+  .al-theme,
+  .al-layout {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+  }
+
   .al-main {
     padding: 12px;
     padding-top: 70px;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
   }
   .al-header {
     padding: 12px;
+    width: 100%;
+    max-width: 100vw;
   }
   .al-menu-toggle {
     top: 12px;
@@ -322,37 +350,47 @@
 
   /* Fix para chatbots en vista móvil - sin scroll horizontal */
   .card {
-    max-width: 100vw;
-    overflow-x: hidden;
-    margin-left: -12px;
-    margin-right: -12px;
-    border-radius: 0;
+    width: 100% !important;
+    max-width: calc(100vw - 24px) !important;
+    overflow: hidden !important;
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 12px;
     padding: 12px;
+    box-sizing: border-box;
   }
 
   .card .iframe-wrap,
   .card > .iframe-wrap {
-    width: calc(100% + 24px);
-    margin: 0 -12px -12px;
-    overflow: hidden;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 12px 0 0 0;
+    padding: 0;
+    overflow: hidden !important;
+    position: relative;
   }
 
   .card .iframe-wrap iframe,
   .card iframe {
     width: 100% !important;
     max-width: 100% !important;
-    border-radius: 0 !important;
+    min-width: auto !important;
+    border-radius: 8px !important;
+    display: block;
   }
 
   .cb-frame-wrap {
-    margin: 0 -12px -12px;
-    padding: 8px;
-    width: calc(100% + 24px);
+    margin: 0;
+    padding: 8px 0;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   .cb-frame-wrap iframe {
     width: 100% !important;
     max-width: 100% !important;
+    min-width: auto !important;
   }
 }
 
@@ -475,13 +513,23 @@
 
 /* Extra small devices (phones with width < 360px) */
 @media (max-width: 360px) {
+  .al-theme,
+  .al-layout,
+  .al-main {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+
   .al-main {
     padding: 8px;
     padding-top: 65px;
+    width: 100%;
   }
 
   .al-header {
     padding: 10px;
+    width: 100%;
+    max-width: 100vw;
   }
 
   .al-header .titles h1 {
@@ -493,11 +541,13 @@
   }
 
   .card {
-    margin-left: -8px;
-    margin-right: -8px;
+    margin-left: 0;
+    margin-right: 0;
     padding: 8px;
-    max-width: 100vw;
-    overflow: hidden;
+    width: 100% !important;
+    max-width: calc(100vw - 16px) !important;
+    overflow: hidden !important;
+    box-sizing: border-box;
   }
 
   .card-title {
@@ -506,19 +556,31 @@
 
   .card .iframe-wrap,
   .card > .iframe-wrap {
-    width: calc(100% + 16px);
-    margin: 0 -8px -8px;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 8px 0 0 0;
+    padding: 0;
+    overflow: hidden !important;
   }
 
   .card .iframe-wrap iframe,
   .card iframe {
-    width: 100vw !important;
-    max-width: 100vw !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: auto !important;
   }
 
   .cb-frame-wrap {
-    margin: 0 -8px -8px;
-    padding: 4px;
-    width: calc(100% + 16px);
+    margin: 0;
+    padding: 4px 0;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .cb-frame-wrap iframe {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: auto !important;
   }
 }
