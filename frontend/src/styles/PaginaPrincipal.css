@@ -143,6 +143,19 @@
   color: white; /* <-- AÑADIDO: Color de texto */
 }
 
+.footer-url a {
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 6px rgba(0, 194, 255, 0.4);
+}
+
+.footer-url a:hover {
+  color: #00c2ff;
+  text-shadow: 0 0 15px rgba(0, 194, 255, 0.8);
+  letter-spacing: 0.15em;
+}
+
 /* 9. RESPONSIVE PARA MÓVILES (Recomendado) */
 @media (max-width: 960px) {
   

@@ -75,7 +75,9 @@ function PaginaPrincipal() {
 
       {/* --- 4. URL Inferior --- */}
       <footer className="footer-url">
-        WWW.MASOTERAPIACHILE.CL
+        <a href="https://www.masoterapiachile.cl" target="_blank" rel="noopener noreferrer">
+          WWW.MASOTERAPIACHILE.CL
+        </a>
       </footer>
 
     </div> // Fin de .pagina-principal
