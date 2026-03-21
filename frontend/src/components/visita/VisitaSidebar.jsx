@@ -20,7 +20,7 @@ export default function VisitaSidebar({
             <aside className={`al-sidebar ${isSidebarOpen ? 'open' : ''}`}>
                 <button className="al-sidebar-close" onClick={toggleSidebar}>&times;</button>
                 <div className="brand">
-                    <div className="logo">🤖</div>
+                    <div className="logo">🤖 </div>
                     <div className="brand-text">
                         <span className="brand-top">Masoterapia </span>
                         <span className="brand-bottom">Chatbots</span>
