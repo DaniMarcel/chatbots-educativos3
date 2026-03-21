@@ -40,6 +40,7 @@ function isAllowedOrigin(origin) {
   if (ALLOWED_STATIC.has(origin)) return true;
   if (/^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(origin)) return true;
   if (/^https:\/\/[a-z0-9-]+\.onrender\.com$/i.test(origin)) return true;
+  if (/^https:\/\/[a-z0-9-]+\.up\.railway\.app$/i.test(origin)) return true;
   return false;
 }
 

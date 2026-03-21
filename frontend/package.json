@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "vite",
+    "dev": "vite",
+    "start": "npx serve -s build -l $PORT",
     "build": "vite build",
     "preview": "vite preview",
     "test": "react-scripts test",
