@@ -101,7 +101,7 @@ app.get("/health", (_req, res) => res.json({ ok: true, mongo: mongoose.connectio
     });
 
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => console.log(`🚀 Backend corriendo en puerto ${PORT}`));
+    app.listen(PORT, "0.0.0.0", () => console.log(`🚀 Backend corriendo en puerto ${PORT}`));
   } catch (err) {
     console.error("No se pudo iniciar el servidor:", err);
     process.exit(1);
