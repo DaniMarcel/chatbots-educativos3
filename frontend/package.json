@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "start": "npx serve -s build -l $PORT",
+    "start": "npx --yes serve -s build",
     "build": "vite build",
     "preview": "vite preview",
     "test": "react-scripts test",
