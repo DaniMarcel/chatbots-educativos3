@@ -50,7 +50,7 @@ export default function VisitaContent({ seccion, config }) {
                         title={chatbot.title}
                         frameBorder="0"
                         allow="clipboard-write; microphone; camera; geolocation; fullscreen; autoplay; encrypted-media"
-                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"
+                        sandbox="allow-downloads allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"
                         referrerPolicy="no-referrer-when-downgrade"
                         loading="lazy"
                         style={{ width: '100%', height: '600px', border: 'none' }}

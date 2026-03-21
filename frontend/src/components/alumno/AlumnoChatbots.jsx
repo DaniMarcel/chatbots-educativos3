@@ -50,7 +50,7 @@ export default function AlumnoChatbots({
                                             height="100%"
                                             frameBorder="0"
                                             allow="clipboard-write; microphone; camera"
-                                            sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                                            sandbox="allow-downloads allow-scripts allow-same-origin allow-popups allow-forms"
                                             key={chatbot.embedUrl}
                                         />
                                     </div>
