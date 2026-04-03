@@ -85,6 +85,42 @@ app.use("/api/guest-panel/config", require("./routes/guest-panel-config"));
 app.get("/", (_req, res) => res.send("🚀 API funcionando correctamente en Render"));
 app.get("/health", (_req, res) => res.json({ ok: true, mongo: mongoose.connection.readyState })); // 1=ok
 
+/* ====== Mantenedor de Actividad (Auto-Login) ====== */
+function iniciarKeepAlive(port) {
+  const KEEPALIVE_INTERVAL = 10 * 60 * 1000; // 10 minutos en milisegundos
+  
+  setInterval(async () => {
+    try {
+      // Puedes usar variables de entorno en Railway si en el futuro cambias el RUT,
+      // pero por defecto usaré el RUT del alumno que indicaste.
+      const RUT = process.env.KEEPALIVE_RUT || "16543646-6";
+
+      // Usar la URL pública en producción si está disponible, sino localhost
+      const baseUrl = process.env.BACKEND_URL || `http://localhost:${port}`;
+      const url = `${baseUrl}/api/login`;
+
+      console.log(`[Keep-Alive] 🔄 Realizando login automático (cada 10 min) con RUT: ${RUT}`);
+      
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // Enviamos únicamente el RUT (sin contraseña, tal como entran los alumnos)
+        body: JSON.stringify({ rut: RUT })
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok && data.token) {
+        console.log(`[Keep-Alive] ✅ Login exitoso. Servidor activo.`);
+      } else {
+        console.log(`[Keep-Alive] ⚠️ Fallo el login (pero el request se hizo):`, data.msg || data);
+      }
+    } catch (error) {
+      console.error(`[Keep-Alive] ❌ Error al intentar login:`, error.message);
+    }
+  }, KEEPALIVE_INTERVAL);
+}
+
 /* ====== Start AFTER DB connect ====== */
 (async () => {
   try {
@@ -102,7 +138,10 @@ app.get("/health", (_req, res) => res.json({ ok: true, mongo: mongoose.connectio
     });
 
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, "0.0.0.0", () => console.log(`🚀 Backend corriendo en puerto ${PORT}`));
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`🚀 Backend corriendo en puerto ${PORT}`);
+      iniciarKeepAlive(PORT); // <--- Llamada a nuestra función mantenedora
+    });
   } catch (err) {
     console.error("No se pudo iniciar el servidor:", err);
     process.exit(1);
