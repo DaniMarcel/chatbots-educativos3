@@ -87,7 +87,7 @@ app.get("/health", (_req, res) => res.json({ ok: true, mongo: mongoose.connectio
 
 /* ====== Mantenedor de Actividad (Auto-Login) ====== */
 function iniciarKeepAlive(port) {
-  const KEEPALIVE_INTERVAL = 10 * 60 * 1000; // 10 minutos en milisegundos
+  const KEEPALIVE_INTERVAL = 2 * 60 * 1000; // 2 minutos para evitar que MongoDB Gratis cierre la conexión TCP
   
   setInterval(async () => {
     try {
@@ -99,7 +99,7 @@ function iniciarKeepAlive(port) {
       const baseUrl = process.env.BACKEND_URL || `http://localhost:${port}`;
       const url = `${baseUrl}/api/login`;
 
-      console.log(`[Keep-Alive] 🔄 Realizando login automático (cada 10 min) con RUT: ${RUT}`);
+      console.log(`[Keep-Alive] 🔄 Realizando login automático (cada 2 min) con RUT: ${RUT}`);
       
       const res = await fetch(url, {
         method: "POST",
@@ -111,12 +111,12 @@ function iniciarKeepAlive(port) {
       const data = await res.json();
       
       if (res.ok && data.token) {
-        console.log(`[Keep-Alive] ✅ Login exitoso. Servidor activo.`);
+        console.log(`[Keep-Alive] ✅ Login exitoso. DB y Servidor activos.`);
       } else {
-        console.log(`[Keep-Alive] ⚠️ Fallo el login (pero el request se hizo):`, data.msg || data);
+        console.log(`[Keep-Alive] ⚠️ Fallo el login (pero la DB respondió):`, data.msg || data);
       }
     } catch (error) {
-      console.error(`[Keep-Alive] ❌ Error al intentar login:`, error.message);
+      console.error(`[Keep-Alive] ❌ Error de red:`, error.message);
     }
   }, KEEPALIVE_INTERVAL);
 }
