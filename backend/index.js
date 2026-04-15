@@ -83,40 +83,86 @@ app.use("/api/guest-panel/config", require("./routes/guest-panel-config"));
 
 
 app.get("/", (_req, res) => res.send("🚀 API funcionando correctamente en Render"));
-app.get("/health", (_req, res) => res.json({ ok: true, mongo: mongoose.connection.readyState })); // 1=ok
+
+app.get("/health", async (_req, res) => {
+  try {
+    // Verificar que MongoDB sigue conectado
+    const mongoState = mongoose.connection.readyState;
+    if (mongoState === 1) {
+      // 1 = conectado, hacer ping rápido a la DB
+      await mongoose.connection.db?.admin()?.ping();
+      return res.json({ ok: true, mongo: "connected", timestamp: new Date().toISOString() });
+    } else {
+      return res.status(503).json({
+        ok: false,
+        mongo: "disconnected",
+        state: mongoState,
+        detail: "MongoDB no está conectado. Intentando reconectar..."
+      });
+    }
+  } catch (err) {
+    return res.status(503).json({ ok: false, mongo: "error", detail: err.message });
+  }
+});
 
 /* ====== Mantenedor de Actividad (Auto-Login) ====== */
 function iniciarKeepAlive(port) {
-  const KEEPALIVE_INTERVAL = 2 * 60 * 1000; // 2 minutos para evitar que MongoDB Gratis cierre la conexión TCP
-  
+  // Render Free Tier: spinea tras 15 min de inactividad → ping cada 5 min es suficiente
+  const KEEPALIVE_INTERVAL = 5 * 60 * 1000;
+
+  // Contador de intentos fallidos consecutivos
+  let fallosConsecutivos = 0;
+  const MAX_FALLBACK_INTENTOS = 3;
+
   setInterval(async () => {
     try {
-      // Puedes usar variables de entorno en Railway si en el futuro cambias el RUT,
-      // pero por defecto usaré el RUT del alumno que indicaste.
-      const RUT = process.env.KEEPALIVE_RUT || "16543646-6";
+      // 1) Primero intenta /health (no requiere auth ni usuario válido)
+      //    Cuenta como tráfico entrante para Render y es mucho más rápido que /api/login.
+      const baseUrlLocal = `http://localhost:${port}`;
+      const urlHealth = `${baseUrlLocal}/health`;
 
-      // Usar la URL pública en producción si está disponible, sino localhost
-      const baseUrl = process.env.BACKEND_URL || `http://localhost:${port}`;
-      const url = `${baseUrl}/api/login`;
+      console.log(`[Keep-Alive] 🔄 Ping a /health`);
 
-      console.log(`[Keep-Alive] 🔄 Realizando login automático (cada 2 min) con RUT: ${RUT}`);
-      
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // Enviamos únicamente el RUT (sin contraseña, tal como entran los alumnos)
-        body: JSON.stringify({ rut: RUT })
+      const resHealth = await fetch(urlHealth, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
       });
-      
-      const data = await res.json();
-      
-      if (res.ok && data.token) {
-        console.log(`[Keep-Alive] ✅ Login exitoso. DB y Servidor activos.`);
+
+      if (resHealth.ok) {
+        const data = await resHealth.json();
+        fallosConsecutivos = 0; // reset
+        console.log(`[Keep-Alive] ✅ Servidor activo | MongoDB state: ${data.mongo} (1=conectado)`);
+        return;
+      }
+
+      // 2) Si /health falla repetidamente, intenta login con RUT como fallback
+      fallosConsecutivos++;
+      if (fallosConsecutivos <= MAX_FALLBACK_INTENTOS) {
+        const RUT = process.env.KEEPALIVE_RUT || "16543646-6";
+        const urlLogin = `${baseUrlLocal}/api/login`;
+
+        console.log(`[Keep-Alive] ⚠️ /health falló, intento fallback con /api/login (RUT: ${RUT})`);
+
+        const resLogin = await fetch(urlLogin, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rut: RUT })
+        });
+
+        const dataLogin = await resLogin.json();
+
+        if (resLogin.ok && dataLogin.token) {
+          console.log(`[Keep-Alive] ✅ Login fallback exitoso. DB y servidor activos.`);
+          fallosConsecutivos = 0;
+        } else {
+          console.log(`[Keep-Alive] ⚠️ Fallback falló:`, dataLogin.msg || dataLogin);
+        }
       } else {
-        console.log(`[Keep-Alive] ⚠️ Fallo el login (pero la DB respondió):`, data.msg || data);
+        console.log(`[Keep-Alive] ⛔ Demasiados fallos consecutivos (${fallosConsecutivos}). Reintentando /health...`);
       }
     } catch (error) {
-      console.error(`[Keep-Alive] ❌ Error de red:`, error.message);
+      fallosConsecutivos++;
+      console.error(`[Keep-Alive] ❌ Error de red (fallos: ${fallosConsecutivos}):`, error.message);
     }
   }, KEEPALIVE_INTERVAL);
 }
@@ -132,9 +178,12 @@ function iniciarKeepAlive(port) {
     mongoose.connection.on("error", (err) => console.error("❌ MongoDB error:", err));
 
     await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 20000,
-      socketTimeoutMS: 45000,
-      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 10000,   // timeout para seleccionar servidor (10s)
+      socketTimeoutMS: 30000,            // timeout por operación (30s)
+      connectTimeoutMS: 10000,           // timeout de conexión inicial (10s)
+      maxPoolSize: 10,                   // máximo de conexiones simultáneos
+      minPoolSize: 1,                    // mantener al menos 1 conexión abierta
+      heartbeatFrequencyMS: 10000,       // chequear conexión cada 10s
     });
 
     const PORT = process.env.PORT || 5000;
