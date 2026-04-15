@@ -82,7 +82,7 @@ app.use("/api/guest-panel", require("./routes/guest-panel"));
 app.use("/api/guest-panel/config", require("./routes/guest-panel-config"));
 
 
-app.get("/", (_req, res) => res.send("🚀 API funcionando correctamente en Render"));
+app.get("/", (_req, res) => res.send("🚀 API funcionando correctamente en Railway"));
 
 app.get("/health", async (_req, res) => {
   try {
@@ -107,8 +107,14 @@ app.get("/health", async (_req, res) => {
 
 /* ====== Mantenedor de Actividad (Auto-Login) ====== */
 function iniciarKeepAlive(port) {
-  // Render Free Tier: spinea tras 15 min de inactividad → ping cada 5 min es suficiente
+  // Railway: spinea tras ~15 min de inactividad (plan trial/credits) → ping cada 5 min
+  // Si usas plan serverless, spinea tras ~5 min → en ese caso baja a 3 min.
   const KEEPALIVE_INTERVAL = 5 * 60 * 1000;
+
+  // URL pública del backend (Railway asigna una URL .up.railway.app)
+  const RAILWAY_URL = process.env.RAILWAY_PUBLIC_URL
+    || process.env.BACKEND_URL
+    || `http://localhost:${port}`;
 
   // Contador de intentos fallidos consecutivos
   let fallosConsecutivos = 0;
@@ -117,11 +123,10 @@ function iniciarKeepAlive(port) {
   setInterval(async () => {
     try {
       // 1) Primero intenta /health (no requiere auth ni usuario válido)
-      //    Cuenta como tráfico entrante para Render y es mucho más rápido que /api/login.
-      const baseUrlLocal = `http://localhost:${port}`;
-      const urlHealth = `${baseUrlLocal}/health`;
+      //    Cuenta como tráfico entrante para Railway y es mucho más rápido que /api/login.
+      const urlHealth = `${RAILWAY_URL}/health`;
 
-      console.log(`[Keep-Alive] 🔄 Ping a /health`);
+      console.log(`[Keep-Alive] 🔄 Ping a /health → ${urlHealth}`);
 
       const resHealth = await fetch(urlHealth, {
         method: "GET",
@@ -131,34 +136,30 @@ function iniciarKeepAlive(port) {
       if (resHealth.ok) {
         const data = await resHealth.json();
         fallosConsecutivos = 0; // reset
-        console.log(`[Keep-Alive] ✅ Servidor activo | MongoDB state: ${data.mongo} (1=conectado)`);
+        console.log(`[Keep-Alive] ✅ Railway activo | MongoDB: ${data.mongo}`);
         return;
       }
 
-      // 2) Si /health falla repetidamente, intenta login con RUT como fallback
+      // 2) Si /health falla, intenta localhost como fallback (el servidor local siempre está vivo)
       fallosConsecutivos++;
       if (fallosConsecutivos <= MAX_FALLBACK_INTENTOS) {
-        const RUT = process.env.KEEPALIVE_RUT || "16543646-6";
-        const urlLogin = `${baseUrlLocal}/api/login`;
+        const urlLocal = `http://localhost:${port}/health`;
 
-        console.log(`[Keep-Alive] ⚠️ /health falló, intento fallback con /api/login (RUT: ${RUT})`);
+        console.log(`[Keep-Alive] ⚠️ /health externo falló, verificando localhost...`);
 
-        const resLogin = await fetch(urlLogin, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ rut: RUT })
+        const resLocal = await fetch(urlLocal, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" }
         });
 
-        const dataLogin = await resLogin.json();
-
-        if (resLogin.ok && dataLogin.token) {
-          console.log(`[Keep-Alive] ✅ Login fallback exitoso. DB y servidor activos.`);
+        if (resLocal.ok) {
+          const dataLocal = await resLocal.json();
+          console.log(`[Keep-Alive] ✅ Proceso vivo localmente | MongoDB: ${dataLocal.mongo}`);
+          console.log(`[Keep-Alive] ⚠️ Si Railway spinea, considera usar UptimeRobot para ping externo`);
           fallosConsecutivos = 0;
-        } else {
-          console.log(`[Keep-Alive] ⚠️ Fallback falló:`, dataLogin.msg || dataLogin);
         }
       } else {
-        console.log(`[Keep-Alive] ⛔ Demasiados fallos consecutivos (${fallosConsecutivos}). Reintentando /health...`);
+        console.log(`[Keep-Alive] ⛔ Demasiados fallos consecutivos (${fallosConsecutivos})`);
       }
     } catch (error) {
       fallosConsecutivos++;
