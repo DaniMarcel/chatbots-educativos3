@@ -183,7 +183,8 @@ function iniciarKeepAlive(port) {
       socketTimeoutMS: 30000,            // timeout por operación (30s)
       connectTimeoutMS: 10000,           // timeout de conexión inicial (10s)
       maxPoolSize: 10,                   // máximo de conexiones simultáneos
-      minPoolSize: 1,                    // mantener al menos 1 conexión abierta
+      minPoolSize: 2,                    // mantener al menos 2 conexiones abierta
+      maxIdleTimeMS: 120000,             // Cierra conexiones inactivas controladamente
       heartbeatFrequencyMS: 10000,       // chequear conexión cada 10s
     });
 
