@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/VisitasRegistradas.css'; // Reutilizamos los mismos estilos
-
-const API_BASE = 'https://chatbots-educativos3-vhfq.onrender.com';
+import { API_ROOT } from '../services/apiConfig';
 
 function VisitasAlumnos() {
   const [visitas, setVisitas] = useState([]);
@@ -11,7 +10,7 @@ function VisitasAlumnos() {
     const fetchVisitasAlumnos = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get(`${API_BASE}/api/visitas/alumnos`, {
+        const res = await axios.get(`${API_ROOT}/api/visitas/alumnos`, {
           headers: { Authorization: `Bearer ${token || ''}` },
         });
         setVisitas(res.data);

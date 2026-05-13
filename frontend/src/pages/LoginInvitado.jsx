@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import '../styles/Login.css';
+import API_BASE from '../services/apiConfig';
 
 function LoginInvitado() {
   const [visita, setVisita] = useState({
@@ -16,7 +17,6 @@ function LoginInvitado() {
   const [phoneError, setPhoneError] = useState('');
 
   const navigate = useNavigate();
-  const API_BASE = 'https://chatbots-educativos3-vhfq.onrender.com/api';
 
   /* ---------------- Helpers ---------------- */
   const isValidEmail = (v = '') =>

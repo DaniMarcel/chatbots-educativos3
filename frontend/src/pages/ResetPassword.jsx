@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/ResetPassword.css';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'https://chatbots-educativos3-vhfq.onrender.com/api';
+import API_BASE from '../services/apiConfig';
 
 export default function ResetPassword() {
   const [sp] = useSearchParams();

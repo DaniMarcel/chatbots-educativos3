@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import '../styles/RegistroProfesor.css';
 import '../styles/GestionarUsuarios.css';
+import API_BASE from '../services/apiConfig';
 import '../styles/RegistroAdmin.css'; // 👈 agrega este import para los estilos del ojo
 
 /* === Catálogo de permisos (SIN "chatbots:crear" ni "chatbots:subir_material") === */
@@ -32,7 +33,6 @@ const PERMISOS_BLOQUEADOS = new Set([
   'chatbots:subir_material',
 ]);
 
-const API_BASE   = 'https://chatbots-educativos3-vhfq.onrender.com/api';
 const EP_CREATE  = `${API_BASE}/admin/profesores`;
 const EP_LIST    = `${API_BASE}/admin/profesores`;
 const TEL_RE     = /^\+?\d{8,12}$/;

@@ -1,70 +1,126 @@
-# Getting Started with Create React App
+# Frontend - Chatbots Educativos
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Aplicacion web en React para el portal **Chatbots Educativos**. Permite el acceso de alumnos, profesores y superadministradores a paneles diferenciados para gestionar cursos, usuarios, chatbots educativos, videos y visitas.
 
-## Available Scripts
+## Tecnologias principales
 
-In the project directory, you can run:
+- React 19
+- Vite
+- React Router
+- Axios
+- SweetAlert2
+- XLSX
+- Capacitor para build Android
 
-### `npm start`
+## Funcionalidades
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Pagina principal publica.
+- Login de alumnos, profesores y superadmin.
+- Registro de alumnos.
+- Recuperacion y restablecimiento de contrasena.
+- Panel de alumno con perfil, chatbots asignados y videos educativos.
+- Panel de profesor para gestionar cursos, alumnos y chatbots.
+- Panel de superadmin para gestionar usuarios, visitas y configuracion publica.
+- Panel de visita/invitado con recursos publicos.
+- Consumo de API REST del backend.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Estructura relevante
 
-### `npm test`
+```text
+frontend/
+  src/
+    components/       Componentes reutilizables
+    components/alumno Componentes del panel de alumno
+    components/visita Componentes del panel de visita
+    hooks/            Hooks de estado y carga de datos
+    pages/            Vistas principales de la aplicacion
+    services/         Cliente HTTP hacia el backend
+    styles/           Hojas de estilo por pantalla
+    utils/            Utilidades de usuario y almacenamiento local
+  android/            Proyecto Android generado por Capacitor
+  capacitor.config.json
+  vite.config.js
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Requisitos
 
-### `npm run build`
+- Node.js
+- npm
+- Backend disponible localmente o desplegado
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Variables de entorno
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Crea un archivo `.env` dentro de `frontend/` si quieres sobrescribir la API por defecto:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```env
+VITE_API_URL=http://localhost:5000/api
+```
 
-### `npm run eject`
+Si no se define, los servicios usan la API desplegada configurada en el codigo.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Instalacion
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm install
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Ejecutar en desarrollo
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+npm run dev
+```
 
-## Learn More
+Por configuracion de Vite, la app se abre en:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```text
+http://localhost:3000
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Compilar para produccion
 
-### Code Splitting
+```bash
+npm run build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+El resultado se genera en:
 
-### Analyzing the Bundle Size
+```text
+build/
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Vista previa del build
 
-### Making a Progressive Web App
+```bash
+npm run preview
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Android con Capacitor
 
-### Advanced Configuration
+El proyecto incluye Capacitor con:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- `appId`: `com.chatbotseducativos.app`
+- `appName`: `Chatbots Educativos`
+- `webDir`: `build`
 
-### Deployment
+Flujo habitual:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```bash
+npm run build
+npx cap sync android
+npx cap open android
+```
 
-### `npm run build` fails to minify
+## Scripts disponibles
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+npm run dev      # Servidor local de Vite
+npm run build    # Build de produccion
+npm run preview  # Preview del build
+npm start        # Sirve build en entornos con PORT
+```
+
+## Notas
+
+- Las rutas protegidas validan token y rol desde `localStorage`.
+- Los servicios HTTP leen `VITE_API_URL` y agregan el token cuando corresponde.
+- El backend debe tener CORS habilitado para el origen donde se ejecute el frontend.

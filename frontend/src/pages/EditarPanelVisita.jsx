@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
 import '../styles/EditarPanelVisita.css';
-
-/* ===== API local/remota ===== */
-/* ========= API base ========= */
-const API_BASE = import.meta.env.VITE_API_URL || 'https://chatbots-educativos3-vhfq.onrender.com/api';
+import API_BASE from '../services/apiConfig';
 
 function EditarPanelVisita() {
   const [welcome, setWelcome] = useState({ title: '', text: '' });

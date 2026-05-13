@@ -3,8 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import "../styles/CargarAlumnos.css";
-
-const API_BASE = "https://chatbots-educativos3-vhfq.onrender.com/api";
+import API_BASE from "../services/apiConfig";
 
 // Columnas requeridas
 const REQUIRED = [

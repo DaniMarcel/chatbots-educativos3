@@ -1,5 +1,5 @@
 import { useState } from 'react';
-const API_BASE = import.meta.env.VITE_API_URL || 'https://chatbots-educativos3-vhfq.onrender.com/api';
+import API_BASE from '../services/apiConfig';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');

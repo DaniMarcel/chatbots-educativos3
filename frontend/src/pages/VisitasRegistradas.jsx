@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import '../styles/VisitasRegistradas.css';
-
-const API_BASE = 'https://chatbots-educativos3-vhfq.onrender.com';
+import { API_ROOT } from '../services/apiConfig';
 
 function VisitasRegistradas() {
   const [visitas, setVisitas] = useState([]);
@@ -12,7 +11,7 @@ function VisitasRegistradas() {
   const fetchVisitas = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`${API_BASE}/api/visitas`, {
+      const res = await axios.get(`${API_ROOT}/api/visitas`, {
         headers: { Authorization: `Bearer ${token || ''}` },
       });
       setVisitas(res.data);
@@ -29,7 +28,7 @@ function VisitasRegistradas() {
     if (window.confirm(`¿Estás seguro de que quieres eliminar todas las visitas de ${correo}?`)) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`${API_BASE}/api/visitas/${correo}`, {
+        await axios.delete(`${API_ROOT}/api/visitas/${correo}`, {
           headers: { Authorization: `Bearer ${token || ''}` },
         });
         fetchVisitas(); // Re-fetch visits after deletion
@@ -44,7 +43,7 @@ function VisitasRegistradas() {
     try {
       setDescargando(true);
       const token = localStorage.getItem('token');
-      const res = await axios.get(`${API_BASE}/api/visitas/exportar`, {
+      const res = await axios.get(`${API_ROOT}/api/visitas/exportar`, {
         responseType: 'blob',
         headers: { Authorization: `Bearer ${token || ''}` },
       });
