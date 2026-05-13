@@ -30,7 +30,6 @@ export default function PanelAlumno() {
   return (
     <div className="al-theme">
       <div className={`al-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
-
         <AlumnoSidebar
           usuario={usuario}
           seccion={seccion}
@@ -40,15 +39,18 @@ export default function PanelAlumno() {
           cerrarSesion={cerrarSesion}
         />
 
-        {/* Main */}
         <div className="al-main-container">
           <header className="al-header">
-            {/* Botón de menú para móviles */}
-            <button className="al-menu-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+            <button
+              className="al-menu-toggle"
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              aria-label="Abrir menu"
+            >
               <span></span>
               <span></span>
               <span></span>
             </button>
+
             <div className="titles">
               <h1>Panel del Alumno</h1>
               <p className="subtitle">Tu información personal, académica y accesos.</p>
