@@ -1,4 +1,4 @@
-const DEFAULT_API_ROOT = 'https://resilient-vision-production-1fad.up.railway.app';
+const DEFAULT_API_ROOT = 'https://resilient-vision-production-1fdd.up.railway.app';
 
 function normalizeApiBase(value) {
   const raw = String(value || DEFAULT_API_ROOT).trim().replace(/\/+$/, '');
