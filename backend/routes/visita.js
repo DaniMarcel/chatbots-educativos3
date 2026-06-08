@@ -171,8 +171,87 @@ router.get('/', verificarToken, autorizarRoles('superadmin'), async (req, res) =
   }
 });
 
-/* ========= Obtener visitas DE MIS ALUMNOS (Solo Profesor) ========= */
+/* ========= Obtener actividad DE MIS ALUMNOS (Solo Profesor) ========= */
 router.get('/alumnos', verificarToken, autorizarRoles('profesor'), async (req, res) => {
+  try {
+    const { id: profesorId } = req.usuario;
+
+    const alumnos = await Alumno.find({ createdBy: profesorId })
+      .select('rut tipo_documento numero_documento nombre apellido correo telefono semestre jornada conteo_ingresos')
+      .sort({ apellido: 1, nombre: 1 })
+      .lean();
+
+    if (!alumnos || alumnos.length === 0) {
+      return res.json([]);
+    }
+
+    const correosAlumnos = alumnos
+      .map((a) => String(a.correo || '').trim().toLowerCase())
+      .filter(Boolean);
+
+    const visitas = await Visita.aggregate([
+      {
+        $match: {
+          correo: { $in: correosAlumnos },
+          rol: 'alumno',
+        },
+      },
+      {
+        $group: {
+          _id: '$correo',
+          ingresosIA: { $sum: 1 },
+          ultimaVisita: { $max: '$fechaHora' },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          correo: '$_id',
+          ingresosIA: 1,
+          ultimaVisita: 1,
+        },
+      },
+    ]);
+
+    const actividadPorCorreo = new Map(
+      visitas.map((v) => [String(v.correo || '').toLowerCase(), v])
+    );
+
+    const rows = alumnos.map((alumno) => {
+      const correo = String(alumno.correo || '').trim().toLowerCase();
+      const actividad = actividadPorCorreo.get(correo);
+      const documento = alumno.numero_documento || alumno.rut || '';
+      const tipoDocumento = alumno.tipo_documento || (alumno.rut ? 'RUT' : 'Documento');
+
+      const ingresosPorVisitas = Number(actividad?.ingresosIA || 0);
+      const ingresosPorAlumno = Number(alumno.conteo_ingresos || 0);
+
+      return {
+        alumnoId: String(alumno._id),
+        documento,
+        rutDni: documento ? `${tipoDocumento} ${documento}` : '-',
+        nombre: `${alumno.nombre || ''} ${alumno.apellido || ''}`.trim() || '-',
+        correo,
+        telefono: alumno.telefono || '',
+        semestre: alumno.semestre ?? '',
+        jornada: alumno.jornada || '',
+        ingresosIA: Math.max(ingresosPorVisitas, ingresosPorAlumno),
+        ultimaVisita: actividad?.ultimaVisita || null,
+      };
+    }).sort((a, b) => {
+      const byLast = new Date(b.ultimaVisita || 0) - new Date(a.ultimaVisita || 0);
+      return byLast || String(a.nombre).localeCompare(String(b.nombre), 'es');
+    });
+
+    return res.json(rows);
+  } catch (err) {
+    console.error('Error al obtener actividad de alumnos:', err);
+    return res.status(500).json({ msg: 'Error al obtener la actividad de los alumnos' });
+  }
+});
+
+/* ========= Obtener visitas DE MIS ALUMNOS (Solo Profesor) - legado ========= */
+router.get('/alumnos-legacy', verificarToken, autorizarRoles('profesor'), async (req, res) => {
   try {
     const { id: profesorId } = req.usuario;
 

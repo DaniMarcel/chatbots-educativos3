@@ -65,3 +65,141 @@
 .delete-btn:hover {
   background-color: #c82333;
 }
+
+.actividad-alumnos {
+  color: #172033;
+}
+
+.actividad-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.actividad-head h2 {
+  margin: 0 0 6px;
+  color: #172033;
+}
+
+.actividad-head p {
+  margin: 0;
+  color: #64748b;
+}
+
+.actividad-resumen {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.resumen-item {
+  min-width: 150px;
+  padding: 12px 14px;
+  border: 1px solid #e3e9f2;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.resumen-item span,
+.actividad-filter span {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.resumen-item strong {
+  color: #172033;
+  font-size: 22px;
+}
+
+.actividad-filter {
+  min-width: 220px;
+}
+
+.actividad-filter select {
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1px solid #d9e2ef;
+  border-radius: 8px;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+}
+
+.actividad-scroll {
+  max-height: 560px;
+  border-color: #e3e9f2;
+  background: #fff;
+}
+
+.actividad-table th {
+  background: #f7f9fc;
+  color: #334155;
+  font-weight: 800;
+}
+
+.actividad-table td {
+  vertical-align: middle;
+}
+
+.td-sub {
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.metric-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eaf0ff;
+  color: #23489c;
+  font-weight: 800;
+}
+
+.metric-pill.is-zero {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.empty-cell {
+  text-align: center !important;
+  color: #64748b;
+  padding: 28px !important;
+}
+
+.visitas-error {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fff1f2;
+  color: #991b1b;
+}
+
+@media (max-width: 720px) {
+  .actividad-head {
+    flex-direction: column;
+  }
+
+  .actividad-head .descargar-btn {
+    width: 100%;
+  }
+
+  .resumen-item,
+  .actividad-filter {
+    width: 100%;
+  }
+}
