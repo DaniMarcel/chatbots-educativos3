@@ -16,6 +16,20 @@ function formatDate(value) {
   });
 }
 
+function normalizeEmail(value = '') {
+  return String(value || '').trim().toLowerCase();
+}
+
+function getAlumnoNombre(alumno) {
+  return `${alumno?.nombre || ''} ${alumno?.apellido || alumno?.apellidos || ''}`.trim();
+}
+
+function getDocumento(alumno = {}) {
+  const documento = alumno.numero_documento || alumno.rut || alumno.documento || '';
+  const tipo = alumno.tipo_documento || (alumno.rut ? 'RUT' : 'Documento');
+  return documento ? `${tipo} ${documento}` : '-';
+}
+
 function VisitasAlumnos() {
   const [actividad, setActividad] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,10 +41,65 @@ function VisitasAlumnos() {
       setLoading(true);
       setError('');
       const token = localStorage.getItem('token');
-      const res = await axios.get(`${API_ROOT}/api/visitas/alumnos`, {
-        headers: { Authorization: `Bearer ${token || ''}` },
+      const headers = { Authorization: `Bearer ${token || ''}` };
+
+      const [actividadRes, alumnosRes] = await Promise.all([
+        axios.get(`${API_ROOT}/api/visitas/alumnos`, { headers }),
+        axios.get(`${API_ROOT}/api/alumnos`, { headers }),
+      ]);
+
+      const actividadData = Array.isArray(actividadRes.data) ? actividadRes.data : [];
+      const alumnosData = Array.isArray(alumnosRes.data) ? alumnosRes.data : [];
+
+      const actividadPorCorreo = new Map(
+        actividadData.map((item) => [normalizeEmail(item.correo), item])
+      );
+
+      const rows = alumnosData.map((alumno) => {
+        const correo = normalizeEmail(alumno.correo);
+        const actividadAlumno = actividadPorCorreo.get(correo);
+        const ingresos = Number(
+          actividadAlumno?.ingresosIA ??
+          actividadAlumno?.visitas ??
+          alumno.conteo_ingresos ??
+          0
+        );
+
+        return {
+          alumnoId: String(alumno._id || actividadAlumno?.alumnoId || correo),
+          rutDni: actividadAlumno?.rutDni || getDocumento(alumno),
+          nombre: getAlumnoNombre(alumno) || actividadAlumno?.nombre || '-',
+          correo,
+          semestre: alumno.semestre ?? actividadAlumno?.semestre ?? '',
+          jornada: alumno.jornada || actividadAlumno?.jornada || '',
+          ingresosIA: ingresos,
+          ultimaVisita: actividadAlumno?.ultimaVisita || null,
+        };
       });
-      setActividad(Array.isArray(res.data) ? res.data : []);
+
+      actividadData.forEach((item) => {
+        const correo = normalizeEmail(item.correo);
+        const exists = rows.some((row) => normalizeEmail(row.correo) === correo);
+        if (!exists) {
+          rows.push({
+            alumnoId: item.alumnoId || correo,
+            rutDni: item.rutDni || item.documento || '-',
+            nombre: item.nombre || '-',
+            correo,
+            semestre: item.semestre || '',
+            jornada: item.jornada || '',
+            ingresosIA: Number(item.ingresosIA ?? item.visitas ?? 0),
+            ultimaVisita: item.ultimaVisita || null,
+          });
+        }
+      });
+
+      rows.sort((a, b) => {
+        const byLast = new Date(b.ultimaVisita || 0) - new Date(a.ultimaVisita || 0);
+        return byLast || String(a.nombre).localeCompare(String(b.nombre), 'es');
+      });
+
+      setActividad(rows);
     } catch (err) {
       console.error('Error al obtener actividad de alumnos:', err);
       setError(err?.response?.data?.msg || 'No se pudo cargar la actividad de alumnos.');
