@@ -71,6 +71,75 @@
 /* ===== MODAL: bloquear scroll del body ===== */
 .cp-no-scroll{ overflow:hidden; }
 
+/* ===== Modal de gestión de alumnos ===== */
+.mgm-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:1100;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  background:rgba(20, 25, 35, .48);
+}
+
+.mgm-modal{
+  width:min(1120px, 96vw);
+  max-height:calc(100vh - 48px);
+  display:grid;
+  grid-template-rows:auto auto minmax(0, 1fr) auto;
+  overflow:hidden;
+  border:1px solid #dbe1e9;
+  border-radius:8px;
+  background:#fff;
+  box-shadow:0 24px 70px rgba(20, 25, 35, .24);
+}
+
+.mgm-header{
+  padding:18px 22px 14px;
+  border-bottom:1px solid #edf0f4;
+  background:#fff;
+}
+
+.mgm-title{
+  margin:0;
+  color:#20242b;
+  font-size:18px;
+  line-height:1.3;
+}
+
+.mgm-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:8px;
+}
+
+.mgm-meta span{
+  padding:4px 8px;
+  border:1px solid #dde2e9;
+  border-radius:6px;
+  background:#f7f8fa;
+  color:#68717e;
+  font-size:12px;
+}
+
+.mgm-modal .mgm-block{
+  min-height:0;
+  overflow:hidden;
+}
+
+.mgm-modal .cp-table-clip{
+  flex:1 1 auto;
+  max-height:none;
+  min-height:180px;
+  overflow:auto;
+}
+
+.mgm-modal .mgm-footer{
+  position:relative;
+  z-index:2;
+}
+
 
 /* Toolbar flexible (sin buscador), se adapta a ancho disponible */
 .mgm-toolbar{
@@ -158,6 +227,23 @@
 
 /* Responsive */
 @media (max-width: 860px){
+  .mgm-backdrop{
+    padding:12px;
+  }
+
+  .mgm-modal{
+    width:100%;
+    max-height:calc(100vh - 24px);
+  }
+
+  .mgm-header,
+  .mgm-toolbar,
+  .mgm-block,
+  .mgm-footer{
+    padding-left:14px;
+    padding-right:14px;
+  }
+
   .mgm-toolbar{
     grid-template-columns: 1fr;
     gap: 10px;
