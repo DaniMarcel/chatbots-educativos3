@@ -88,10 +88,13 @@
 .mgm-block{ padding:14px 22px; display:flex; flex-direction:column; gap:10px; }
 .mgm-block + .mgm-block{ border-top:1px dashed #f1f5f9; }
 .mgm-block-title{
-  font-weight:700; color:#0f172a; display:flex; align-items:center; gap:10px;
+  font-weight:700; color:#0f172a; display:flex; align-items:center; gap:10px; flex-wrap:wrap;
 }
 .mgm-count{
   background:#eef2ff; color:#3730a3; padding:2px 8px; border-radius:999px; font-size:12px;
+}
+.mgm-bulk-actions{
+  margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap;
 }
 
 .mgm-footer{
@@ -139,6 +142,7 @@
 .btn{ height:38px; padding:0 14px; border-radius:10px; border:1px solid transparent; font-weight:600; cursor:pointer; }
 .btn-primary{ background:#1d4ed8; color:#fff; }
 .btn-primary:hover{ filter:brightness(1.06); }
+.btn-secondary{ background:#f1f5f9; color:#334155; border-color:#dbe3ec; }
 .btn-ghost{ background:#fff; border:1px solid #e5e7eb; }
 .btn-danger{ background:#ef4444; color:#fff; }
 
@@ -170,6 +174,15 @@
   .cp-select {
     height: 36px;
     padding: 6px 8px;
+  }
+
+  .mgm-bulk-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .mgm-bulk-actions .btn {
+    flex: 1 1 190px;
   }
 }
 

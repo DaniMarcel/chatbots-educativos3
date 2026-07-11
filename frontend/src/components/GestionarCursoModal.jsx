@@ -16,6 +16,7 @@ export default function GestionarCursoModal({
     const [misAlumnos, setMisAlumnos] = useState([]);
     const [cargandoAlumnos, setCargandoAlumnos] = useState(false);
     const [toggling, setToggling] = useState({}); // { [alumnoId]: true }
+    const [bulkBusy, setBulkBusy] = useState("");
     const [jornadaFilter, setJornadaFilter] = useState(""); // Filtro por jornada
 
     useEffect(() => {
@@ -69,9 +70,39 @@ export default function GestionarCursoModal({
 
     // Set de inscritos para este curso (para decidir el botón)
     const inscritosSet = useMemo(() => {
-        const ids = (curso?.alumnos || []).map(x => typeof x === "string" ? x : x._id);
+        const ids = (curso?.alumnos || []).map(x => String(typeof x === "string" ? x : x._id));
         return new Set(ids);
     }, [curso?.alumnos]);
+
+    const bulkCounts = useMemo(() => {
+        const ids = alumnosFiltrados.map((a) => String(a._id)).filter(Boolean);
+        return {
+            habilitar: ids.filter((id) => !inscritosSet.has(id)).length,
+            deshabilitar: ids.filter((id) => inscritosSet.has(id)).length,
+        };
+    }, [alumnosFiltrados, inscritosSet]);
+
+    const aplicarAccesoMasivo = useCallback(async (habilitar) => {
+        const ids = alumnosFiltrados
+            .map((a) => String(a._id))
+            .filter((id) => habilitar ? !inscritosSet.has(id) : inscritosSet.has(id));
+        if (!ids.length) return;
+
+        const accion = habilitar ? "habilitar" : "deshabilitar";
+        const scope = jornadaFilter ? ` de la jornada ${jornadaFilter}` : "";
+        if (!window.confirm(`¿Deseas ${accion} a ${ids.length} alumnos${scope}?`)) return;
+
+        setBulkBusy(accion);
+        try {
+            const result = await courseService.setAccesoMasivo(curso._id, ids, habilitar);
+            await fetchCursoDetallado(curso._id);
+            alert(`${result?.afectados ?? ids.length} alumnos ${habilitar ? "habilitados" : "deshabilitados"}.`);
+        } catch (e) {
+            alert(e?.response?.data?.msg || e.message || "Error al actualizar los accesos");
+        } finally {
+            setBulkBusy("");
+        }
+    }, [alumnosFiltrados, inscritosSet, jornadaFilter, curso?._id, fetchCursoDetallado]);
 
     return (
         <div className="mgm-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }} role="dialog" aria-modal="true">
@@ -145,6 +176,24 @@ export default function GestionarCursoModal({
                         <button className="btn btn-secondary" onClick={fetchMisAlumnos} style={{ marginLeft: '10px' }}>
                             Refrescar alumnos
                         </button>
+                        <div className="mgm-bulk-actions">
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => aplicarAccesoMasivo(true)}
+                                disabled={!!bulkBusy || cargandoAlumnos || bulkCounts.habilitar === 0}
+                                title="Habilitar a todos los alumnos visibles"
+                            >
+                                {bulkBusy === "habilitar" ? "Habilitando..." : `Habilitar a todos (${bulkCounts.habilitar})`}
+                            </button>
+                            <button
+                                className="btn btn-danger"
+                                onClick={() => aplicarAccesoMasivo(false)}
+                                disabled={!!bulkBusy || cargandoAlumnos || bulkCounts.deshabilitar === 0}
+                                title="Deshabilitar a todos los alumnos visibles"
+                            >
+                                {bulkBusy === "deshabilitar" ? "Deshabilitando..." : `Deshabilitar a todos (${bulkCounts.deshabilitar})`}
+                            </button>
+                        </div>
                     </div>
                     <div className="cp-table-clip">
                         <table className="cp-table">
@@ -159,7 +208,7 @@ export default function GestionarCursoModal({
                                     alumnosFiltrados.map((a) => {
                                         const id = a._id;
                                         const inscrito = inscritosSet.has(id);
-                                        const btnBusy = !!toggling[id];
+                                        const btnBusy = !!toggling[id] || !!bulkBusy;
                                         return (
                                             <tr key={id}>
                                                 <td>{docDe(a)}</td>

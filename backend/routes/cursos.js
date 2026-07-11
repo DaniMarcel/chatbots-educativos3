@@ -205,6 +205,79 @@ router.post(
   }
 );
 
+/* Habilitar / deshabilitar varios alumnos de una vez */
+router.post(
+  "/:id/alumnos/acceso-masivo",
+  verificarToken,
+  autorizarRoles("profesor", "admin", "superadmin"),
+  async (req, res) => {
+    try {
+      const { alumnoIds = [], habilitar } = req.body || {};
+      if (typeof habilitar !== "boolean") {
+        return res.status(400).json({ msg: "Debes indicar si deseas habilitar o deshabilitar" });
+      }
+
+      const ids = Array.from(new Set((alumnoIds || []).map(String)))
+        .filter((id) => mongoose.isValidObjectId(id));
+      if (!ids.length) {
+        return res.status(400).json({ msg: "No se recibieron alumnos validos" });
+      }
+
+      let curso = await Curso.findById(req.params.id);
+      if (!curso) return res.status(404).json({ msg: "Curso no encontrado" });
+      if (
+        String(req.usuario.rol).toLowerCase() === "profesor" &&
+        String(curso.profesorId) !== String(req.usuario.id)
+      ) {
+        return res.status(403).json({ msg: "No autorizado" });
+      }
+
+      const actuales = new Set((curso.alumnos || []).map(String));
+      const afectados = [];
+
+      if (habilitar) {
+        ids.forEach((id) => {
+          if (!actuales.has(id)) afectados.push(id);
+          actuales.add(id);
+        });
+        curso.alumnos = Array.from(actuales).map((id) => new mongoose.Types.ObjectId(id));
+      } else {
+        const objetivo = new Set(ids);
+        ids.forEach((id) => {
+          if (actuales.has(id)) afectados.push(id);
+        });
+        curso.alumnos = (curso.alumnos || []).filter((id) => !objetivo.has(String(id)));
+      }
+
+      await curso.save();
+
+      if (curso.chatbotId && afectados.length) {
+        const chatbotId = String(curso.chatbotId);
+        const cursoId = String(curso._id);
+        if (habilitar) {
+          await Promise.all(
+            afectados.map((alumnoId) => linkAlumnoChatbot(alumnoId, chatbotId, cursoId))
+          );
+        } else {
+          await Promise.all(
+            afectados.map((alumnoId) => unlinkAlumnoChatbotForCurso(alumnoId, chatbotId, cursoId))
+          );
+        }
+      }
+
+      curso = await populateAlumnos(Curso.findById(curso._id)).exec();
+      return res.json({
+        curso,
+        afectados: afectados.length,
+        accion: habilitar ? "habilitados" : "deshabilitados",
+      });
+    } catch (e) {
+      console.error("POST /cursos/:id/alumnos/acceso-masivo error:", e);
+      return res.status(500).json({ msg: "Error al actualizar accesos masivos" });
+    }
+  }
+);
+
 /* Agregar alumnos (array de ids) */
 router.post(
   "/:id/alumnos",

@@ -58,6 +58,16 @@ const courseService = {
         return response.data;
     },
 
+    // Habilitar o deshabilitar varios alumnos en el curso
+    setAccesoMasivo: async (cursoId, alumnoIds, habilitar) => {
+        const response = await axios.post(
+            `${API_BASE}/cursos/${cursoId}/alumnos/acceso-masivo`,
+            { alumnoIds, habilitar },
+            { headers: getAuthHeader() }
+        );
+        return response.data;
+    },
+
     // Desinscribir alumno de un curso
     desinscribirAlumno: async (cursoId, alumnoId) => {
         const response = await axios.delete(

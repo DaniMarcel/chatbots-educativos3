@@ -38,6 +38,15 @@ if (process.env.FRONT_URL) {
 function isAllowedOrigin(origin) {
   if (!origin) return true; // Permitir orígenes vacíos
   if (ALLOWED_STATIC.has(origin)) return true;
+  try {
+    const url = new URL(origin);
+    const host = url.hostname;
+    const isLocalhost = host === "localhost" || host === "127.0.0.1";
+    const isPrivateLan = /^192\.168\.\d{1,3}\.\d{1,3}$/.test(host)
+      || /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(host)
+      || /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(host);
+    if (url.protocol === "http:" && (isLocalhost || isPrivateLan)) return true;
+  } catch {}
   if (/^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(origin)) return true;
   if (/^https:\/\/[a-z0-9-]+\.onrender\.com$/i.test(origin)) return true;
   if (/^https:\/\/[a-z0-9-]+\.up\.railway\.app$/i.test(origin)) return true;
