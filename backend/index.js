@@ -89,6 +89,7 @@ app.use("/api/chatbot-categorias", require("./routes/chatbot-categorias"));
 app.use("/api", require("./routes/alumno-chatbots"));              // endpoints de permisos
 app.use("/api/guest-panel", require("./routes/guest-panel"));
 app.use("/api/guest-panel/config", require("./routes/guest-panel-config"));
+app.use("/api/historial-semestre", require("./routes/historial-semestre"));
 
 
 app.get("/", (_req, res) => res.send("🚀 API funcionando correctamente en Railway"));

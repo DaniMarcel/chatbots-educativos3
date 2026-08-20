@@ -4,6 +4,7 @@ import axios from "axios";
 import * as XLSX from "xlsx";
 import "../styles/CargarAlumnos.css";
 import API_BASE from "../services/apiConfig";
+import HistorialSemestres from "./HistorialSemestres";
 
 // Columnas requeridas
 const REQUIRED = [
@@ -56,7 +57,7 @@ const ALIASES = {
   jornada: ["jornada", "turno", "horario"],
 };
 
-// si vienen columnas “rut”, “dni”, “pasaporte”, etc.
+// si vienen columnas "rut", "dni", "pasaporte", etc.
 const DOC_COLUMNS = {
   rut: "RUT",
   dni: "DNI",
@@ -456,6 +457,10 @@ function CargarAlumno() {
           </tbody>
         </table>
       </div>
+
+      <hr style={{ margin: "24px 0" }} />
+
+      <HistorialSemestres />
     </div>
   );
 }
