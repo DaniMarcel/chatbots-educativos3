@@ -18,6 +18,8 @@ export default function GestionarCursoModal({
     const [toggling, setToggling] = useState({}); // { [alumnoId]: true }
     const [bulkBusy, setBulkBusy] = useState("");
     const [jornadaFilter, setJornadaFilter] = useState(""); // Filtro por jornada
+    const [anioFilter, setAnioFilter] = useState(() => String(curso?.anio ?? "")); // Pre-selecciona el año del curso
+    const [semestreFilter, setSemestreFilter] = useState(() => String(curso?.semestre ?? "")); // Pre-selecciona el semestre del curso
 
     useEffect(() => {
         document.body.classList.add("cp-no-scroll");
@@ -42,10 +44,15 @@ export default function GestionarCursoModal({
 
     useEffect(() => { fetchMisAlumnos(); }, [fetchMisAlumnos]);
 
-    // Filtrar alumnos por jornada
+    // Filtrar alumnos por jornada, año y semestre
     const alumnosFiltrados = useMemo(() => {
-        return misAlumnos.filter(a => !jornadaFilter || a.jornada === jornadaFilter);
-    }, [misAlumnos, jornadaFilter]);
+        return misAlumnos.filter(a => {
+            if (jornadaFilter && a.jornada !== jornadaFilter) return false;
+            if (anioFilter && String(a.anio) !== anioFilter) return false;
+            if (semestreFilter && String(a.semestre) !== semestreFilter) return false;
+            return true;
+        });
+    }, [misAlumnos, jornadaFilter, anioFilter, semestreFilter]);
 
     // Inscribir (habilitar) / Quitar (deshabilitar)
     const agregarAlumnos = useCallback(async (alumnoIds) => {
@@ -89,7 +96,11 @@ export default function GestionarCursoModal({
         if (!ids.length) return;
 
         const accion = habilitar ? "habilitar" : "deshabilitar";
-        const scope = jornadaFilter ? ` de la jornada ${jornadaFilter}` : "";
+        const parts = [];
+        if (jornadaFilter) parts.push(`jornada ${jornadaFilter}`);
+        if (anioFilter) parts.push(`año ${anioFilter}`);
+        if (semestreFilter) parts.push(`semestre ${semestreFilter}`);
+        const scope = parts.length ? ` (${parts.join(", ")})` : "";
         if (!window.confirm(`¿Deseas ${accion} a ${ids.length} alumnos${scope}?`)) return;
 
         setBulkBusy(accion);
@@ -102,7 +113,7 @@ export default function GestionarCursoModal({
         } finally {
             setBulkBusy("");
         }
-    }, [alumnosFiltrados, inscritosSet, jornadaFilter, curso?._id, fetchCursoDetallado]);
+    }, [alumnosFiltrados, inscritosSet, jornadaFilter, anioFilter, semestreFilter, curso?._id, fetchCursoDetallado]);
 
     return (
         <div className="mgm-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }} role="dialog" aria-modal="true">
@@ -166,9 +177,33 @@ export default function GestionarCursoModal({
                         Resultados <span className="mgm-count">{alumnosFiltrados.length}</span>
                         <select
                             className="cp-select"
+                            value={anioFilter}
+                            onChange={(e) => setAnioFilter(e.target.value)}
+                            style={{ marginLeft: '10px', width: 'auto' }}
+                            title="Filtrar por año"
+                        >
+                            <option value="">Todos los años</option>
+                            {[...new Set(misAlumnos.map(a => a.anio).filter(Boolean))].sort((a, b) => b - a).map(y => (
+                                <option key={y} value={String(y)}>{y}</option>
+                            ))}
+                        </select>
+                        <select
+                            className="cp-select"
+                            value={semestreFilter}
+                            onChange={(e) => setSemestreFilter(e.target.value)}
+                            style={{ marginLeft: '6px', width: 'auto' }}
+                            title="Filtrar por semestre"
+                        >
+                            <option value="">Ambos semestres</option>
+                            <option value="1">1er Semestre</option>
+                            <option value="2">2do Semestre</option>
+                        </select>
+                        <select
+                            className="cp-select"
                             value={jornadaFilter}
                             onChange={(e) => setJornadaFilter(e.target.value)}
-                            style={{ marginLeft: '10px', width: 'auto' }}
+                            style={{ marginLeft: '6px', width: 'auto' }}
+                            title="Filtrar por jornada"
                         >
                             <option value="">Todas las jornadas</option>
                             {JORNADAS.map((j) => <option key={j} value={j}>{j}</option>)}
