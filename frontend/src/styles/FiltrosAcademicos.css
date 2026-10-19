@@ -1,0 +1,89 @@
+.filtros-academicos {
+  width: 100%;
+  min-width: 0;
+  color: #334155;
+  font-size: 13px;
+}
+
+.fa-controles,
+.fa-agregar {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.fa-campo {
+  display: flex;
+  flex: 1 1 150px;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.fa-campo > span {
+  font-weight: 600;
+}
+
+.filtros-academicos .fa-campo select,
+.filtros-academicos .fa-campo input {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  height: 38px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid #d9e2ef;
+  border-radius: 7px;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+}
+
+.fa-boton {
+  height: 38px;
+  margin: 0;
+  padding: 0 12px;
+  border: 1px solid #d9e2ef;
+  border-radius: 7px;
+  background: #f1f5f9;
+  color: #334155;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fa-boton:disabled {
+  opacity: .6;
+  cursor: default;
+}
+
+.fa-guardar {
+  background: #1d4ed8;
+  color: #fff;
+  border-color: #1d4ed8;
+}
+
+.fa-agregar {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #e3e9f2;
+  border-radius: 7px;
+  background: #f8fafc;
+}
+
+.fa-agregar .fa-campo {
+  flex: 0 1 180px;
+}
+
+.fa-error {
+  margin: 8px 0 0;
+  color: #b91c1c;
+}
+
+@media (max-width: 600px) {
+  .fa-controles .fa-campo,
+  .fa-agregar .fa-campo {
+    flex-basis: 100%;
+  }
+}

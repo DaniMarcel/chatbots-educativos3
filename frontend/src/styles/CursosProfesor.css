@@ -125,7 +125,7 @@
 
 .mgm-modal .mgm-block{
   min-height:0;
-  overflow:hidden;
+  overflow:auto;
 }
 
 .mgm-modal .cp-table-clip{

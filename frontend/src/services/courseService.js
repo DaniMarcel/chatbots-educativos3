@@ -7,6 +7,16 @@ const getAuthHeader = () => {
 };
 
 const courseService = {
+    getAniosAcademicos: async () => {
+        const response = await axios.get(`${API_BASE}/cursos/anios-academicos`, { headers: getAuthHeader() });
+        return response.data;
+    },
+
+    agregarAnioAcademico: async (anio) => {
+        const response = await axios.post(`${API_BASE}/cursos/anios-academicos`, { anio }, { headers: getAuthHeader() });
+        return response.data;
+    },
+
     // Obtener cursos de un profesor
     getCursos: async (profesorId) => {
         const url = `${API_BASE}/cursos${profesorId ? `?profesor=${profesorId}` : ''}`;

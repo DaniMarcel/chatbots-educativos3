@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { JORNADAS, nombreDe, docDe } from '../utils/userHelpers';
+import { nombreDe, docDe } from '../utils/userHelpers';
+import { anioDe, filtrarAlumnosAcademicos } from '../utils/filtrosAcademicos';
+import FiltrosAcademicos from './FiltrosAcademicos';
 import courseService from '../services/courseService';
 
 export default function GestionarCursoModal({
@@ -46,11 +48,8 @@ export default function GestionarCursoModal({
 
     // Filtrar alumnos por jornada, año y semestre
     const alumnosFiltrados = useMemo(() => {
-        return misAlumnos.filter(a => {
-            if (jornadaFilter && a.jornada !== jornadaFilter) return false;
-            if (anioFilter && String(a.anio) !== anioFilter) return false;
-            if (semestreFilter && String(a.semestre) !== semestreFilter) return false;
-            return true;
+        return filtrarAlumnosAcademicos(misAlumnos, {
+            anio: anioFilter, semestre: semestreFilter, jornada: jornadaFilter,
         });
     }, [misAlumnos, jornadaFilter, anioFilter, semestreFilter]);
 
@@ -175,39 +174,6 @@ export default function GestionarCursoModal({
                 <div className="mgm-block">
                     <div className="mgm-block-title">
                         Resultados <span className="mgm-count">{alumnosFiltrados.length}</span>
-                        <select
-                            className="cp-select"
-                            value={anioFilter}
-                            onChange={(e) => setAnioFilter(e.target.value)}
-                            style={{ marginLeft: '10px', width: 'auto' }}
-                            title="Filtrar por año"
-                        >
-                            <option value="">Todos los años</option>
-                            {[...new Set(misAlumnos.map(a => a.anio).filter(Boolean))].sort((a, b) => b - a).map(y => (
-                                <option key={y} value={String(y)}>{y}</option>
-                            ))}
-                        </select>
-                        <select
-                            className="cp-select"
-                            value={semestreFilter}
-                            onChange={(e) => setSemestreFilter(e.target.value)}
-                            style={{ marginLeft: '6px', width: 'auto' }}
-                            title="Filtrar por semestre"
-                        >
-                            <option value="">Ambos semestres</option>
-                            <option value="1">1er Semestre</option>
-                            <option value="2">2do Semestre</option>
-                        </select>
-                        <select
-                            className="cp-select"
-                            value={jornadaFilter}
-                            onChange={(e) => setJornadaFilter(e.target.value)}
-                            style={{ marginLeft: '6px', width: 'auto' }}
-                            title="Filtrar por jornada"
-                        >
-                            <option value="">Todas las jornadas</option>
-                            {JORNADAS.map((j) => <option key={j} value={j}>{j}</option>)}
-                        </select>
                         <button className="btn btn-secondary" onClick={fetchMisAlumnos} style={{ marginLeft: '10px' }}>
                             Refrescar alumnos
                         </button>
@@ -230,6 +196,12 @@ export default function GestionarCursoModal({
                             </button>
                         </div>
                     </div>
+                    <FiltrosAcademicos
+                        anio={anioFilter} semestre={semestreFilter} jornada={jornadaFilter}
+                        onAnioChange={setAnioFilter} onSemestreChange={setSemestreFilter} onJornadaChange={setJornadaFilter}
+                        aniosDisponibles={[curso?.anio, ...misAlumnos.map(anioDe)]}
+                        jornadasDisponibles={misAlumnos.map((a) => a.jornada)}
+                    />
                     <div className="cp-table-clip">
                         <table className="cp-table">
                             <colgroup>
@@ -275,7 +247,7 @@ export default function GestionarCursoModal({
                                         );
                                     })
                                 ) : (
-                                    <tr><td colSpan="5">No tienes alumnos creados aún.</td></tr>
+                                    <tr><td colSpan="5">{misAlumnos.length ? "No hay alumnos que coincidan con los filtros seleccionados." : "No tienes alumnos creados aún."}</td></tr>
                                 ))}
                             </tbody>
                         </table>

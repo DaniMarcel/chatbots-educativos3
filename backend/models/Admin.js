@@ -52,6 +52,11 @@ const AdminSchema = new mongoose.Schema(
 
     permisos: { type: [String], default: [] },
 
+    aniosAcademicos: {
+      type: [{ type: Number, min: 2000, max: 9999, validate: Number.isInteger }],
+      default: [],
+    },
+
     tipo_documento: {
       type: String,
       trim: true,

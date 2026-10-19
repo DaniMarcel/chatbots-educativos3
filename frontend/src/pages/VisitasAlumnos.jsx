@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import '../styles/VisitasRegistradas.css';
 import { API_ROOT } from '../services/apiConfig';
+import FiltrosAcademicos from '../components/FiltrosAcademicos';
+import { anioDe, filtrarAlumnosAcademicos } from '../utils/filtrosAcademicos';
 
 function formatDate(value) {
   if (!value) return '-';
@@ -34,6 +36,8 @@ function VisitasAlumnos() {
   const [actividad, setActividad] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [anio, setAnio] = useState('');
+  const [semestre, setSemestre] = useState('');
   const [jornada, setJornada] = useState('');
 
   const fetchActividad = useCallback(async () => {
@@ -70,6 +74,7 @@ function VisitasAlumnos() {
           rutDni: actividadAlumno?.rutDni || getDocumento(alumno),
           nombre: getAlumnoNombre(alumno) || actividadAlumno?.nombre || '-',
           correo,
+          anio: anioDe(alumno) || anioDe(actividadAlumno),
           semestre: alumno.semestre ?? actividadAlumno?.semestre ?? '',
           jornada: alumno.jornada || actividadAlumno?.jornada || '',
           ingresosIA: ingresos,
@@ -86,6 +91,7 @@ function VisitasAlumnos() {
             rutDni: item.rutDni || item.documento || '-',
             nombre: item.nombre || '-',
             correo,
+            anio: anioDe(item),
             semestre: item.semestre || '',
             jornada: item.jornada || '',
             ingresosIA: Number(item.ingresosIA ?? item.visitas ?? 0),
@@ -113,16 +119,9 @@ function VisitasAlumnos() {
     fetchActividad();
   }, [fetchActividad]);
 
-  const jornadas = useMemo(() => {
-    return Array.from(new Set(
-      actividad.map((alumno) => String(alumno.jornada || '').trim()).filter(Boolean)
-    )).sort((a, b) => a.localeCompare(b, 'es'));
-  }, [actividad]);
-
   const actividadFiltrada = useMemo(() => {
-    if (!jornada) return actividad;
-    return actividad.filter((alumno) => String(alumno.jornada || '') === jornada);
-  }, [actividad, jornada]);
+    return filtrarAlumnosAcademicos(actividad, { anio, semestre, jornada });
+  }, [actividad, anio, semestre, jornada]);
 
   const totalIngresos = useMemo(() => {
     return actividadFiltrada.reduce((sum, alumno) => sum + Number(alumno.ingresosIA || 0), 0);
@@ -135,6 +134,7 @@ function VisitasAlumnos() {
           <h2>Actividad de Alumnos</h2>
           <p>
             Revisa el uso real de la IA por alumno: total de ingresos y última fecha registrada.
+            {' '}Los filtros seleccionan alumnos por su año de ingreso, semestre y jornada.
           </p>
         </div>
         <button className="descargar-btn" onClick={fetchActividad} disabled={loading}>
@@ -151,15 +151,12 @@ function VisitasAlumnos() {
           <span>Ingresos totales</span>
           <strong>{totalIngresos}</strong>
         </div>
-        <label className="actividad-filter">
-          <span>Jornada</span>
-          <select value={jornada} onChange={(e) => setJornada(e.target.value)}>
-            <option value="">Todas las jornadas</option>
-            {jornadas.map((item) => (
-              <option key={item} value={item}>{item}</option>
-            ))}
-          </select>
-        </label>
+        <FiltrosAcademicos
+          anio={anio} semestre={semestre} jornada={jornada}
+          onAnioChange={setAnio} onSemestreChange={setSemestre} onJornadaChange={setJornada}
+          aniosDisponibles={actividad.map(anioDe)}
+          jornadasDisponibles={actividad.map((alumno) => alumno.jornada)}
+        />
       </div>
 
       {error && <div className="visitas-error">{error}</div>}
@@ -170,6 +167,7 @@ function VisitasAlumnos() {
             <tr>
               <th>RUT/DNI</th>
               <th>Nombre</th>
+              <th>Año</th>
               <th>Semestre</th>
               <th>Jornada</th>
               <th>Ingresos a la IA</th>
@@ -184,6 +182,7 @@ function VisitasAlumnos() {
                   <strong>{alumno.nombre || '-'}</strong>
                   {alumno.correo && <span className="td-sub">{alumno.correo}</span>}
                 </td>
+                <td>{alumno.anio || '-'}</td>
                 <td>{alumno.semestre || '-'}</td>
                 <td>{alumno.jornada || '-'}</td>
                 <td>
@@ -197,7 +196,7 @@ function VisitasAlumnos() {
 
             {!loading && !actividadFiltrada.length && (
               <tr>
-                <td colSpan={6} className="empty-cell">
+                <td colSpan={7} className="empty-cell">
                   No hay alumnos para mostrar con este filtro.
                 </td>
               </tr>
@@ -205,7 +204,7 @@ function VisitasAlumnos() {
 
             {loading && (
               <tr>
-                <td colSpan={6} className="empty-cell">
+                <td colSpan={7} className="empty-cell">
                   Cargando actividad...
                 </td>
               </tr>

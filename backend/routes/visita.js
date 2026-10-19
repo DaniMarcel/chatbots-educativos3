@@ -177,7 +177,7 @@ router.get('/alumnos', verificarToken, autorizarRoles('profesor'), async (req, r
     const { id: profesorId } = req.usuario;
 
     const alumnos = await Alumno.find({ createdBy: profesorId })
-      .select('rut tipo_documento numero_documento nombre apellido correo telefono semestre jornada conteo_ingresos')
+      .select('rut tipo_documento numero_documento nombre apellido correo telefono anio fechaIngreso semestre jornada conteo_ingresos')
       .sort({ apellido: 1, nombre: 1 })
       .lean();
 
@@ -233,6 +233,8 @@ router.get('/alumnos', verificarToken, autorizarRoles('profesor'), async (req, r
         nombre: `${alumno.nombre || ''} ${alumno.apellido || ''}`.trim() || '-',
         correo,
         telefono: alumno.telefono || '',
+        anio: alumno.anio ?? '',
+        fechaIngreso: alumno.fechaIngreso || null,
         semestre: alumno.semestre ?? '',
         jornada: alumno.jornada || '',
         ingresosIA: Math.max(ingresosPorVisitas, ingresosPorAlumno),

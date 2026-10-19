@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const { verificarToken, autorizarRoles } = require("../middlewares/auth");
 const Curso = require("../models/Curso");
+const Admin = require("../models/Admin");
 const Chatbot = require("../models/Chatbot");
 const AlumnoChatbot = require("../models/AlumnoChatbot"); // 👈 nuevo
 
@@ -53,6 +54,47 @@ router.get(
     } catch (e) {
       console.error("GET /cursos error:", e);
       return res.status(500).json({ msg: "Error al cargar cursos" });
+    }
+  }
+);
+
+/* Años agregados por el usuario, compartidos entre gestión y seguimiento. */
+router.get(
+  "/anios-academicos",
+  verificarToken,
+  autorizarRoles("profesor", "admin", "superadmin"),
+  async (req, res) => {
+    try {
+      const usuario = await Admin.findById(req.usuario.id).select("aniosAcademicos").lean();
+      if (!usuario) return res.status(404).json({ msg: "Usuario no encontrado" });
+      return res.json(usuario.aniosAcademicos || []);
+    } catch (e) {
+      console.error("GET /cursos/anios-academicos error:", e);
+      return res.status(500).json({ msg: "No se pudieron cargar los años guardados" });
+    }
+  }
+);
+
+router.post(
+  "/anios-academicos",
+  verificarToken,
+  autorizarRoles("profesor", "admin", "superadmin"),
+  async (req, res) => {
+    const valor = req.body?.anio;
+    if (!["number", "string"].includes(typeof valor) || !/^\d{4}$/.test(String(valor)) || Number(valor) < 2000) {
+      return res.status(400).json({ msg: "Ingresa un año válido entre 2000 y 9999" });
+    }
+    try {
+      const usuario = await Admin.findByIdAndUpdate(
+        req.usuario.id,
+        { $addToSet: { aniosAcademicos: Number(valor) } },
+        { new: true, runValidators: true }
+      ).select("aniosAcademicos").lean();
+      if (!usuario) return res.status(404).json({ msg: "Usuario no encontrado" });
+      return res.json(usuario.aniosAcademicos || []);
+    } catch (e) {
+      console.error("POST /cursos/anios-academicos error:", e);
+      return res.status(500).json({ msg: "No se pudo guardar el año. Inténtalo nuevamente" });
     }
   }
 );
